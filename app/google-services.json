@@ -1,0 +1,114 @@
+{
+  "project_info": {
+    "project_number": "926095793145",
+    "firebase_url": "https://travelmantics-6a12f.firebaseio.com",
+    "project_id": "travelmantics-6a12f",
+    "storage_bucket": "travelmantics-6a12f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926095793145:android:2eea214979fa665d1c7b28",
+        "android_client_info": {
+          "package_name": "com.ephraim.me.travelmantix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "926095793145-e70vb50jl9em5vsqhjjd9kbn0qt4pep7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ephraim.me.travelmantix",
+            "certificate_hash": "95b19dde12c0566eded5b3f2d5ae50248f60ecba"
+          }
+        },
+        {
+          "client_id": "926095793145-jml6ire2tfmq37eanvsh34bbdesefkhk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ephraim.me.travelmantix",
+            "certificate_hash": "59268cc3e0fe640d0c3ecab4ab788d613d8e85ad"
+          }
+        },
+        {
+          "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdjA84lu5QQRKvpwNRMXnnuHFyT2SekRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926095793145:android:6826b08858ed349b1c7b28",
+        "android_client_info": {
+          "package_name": "com.kanyandula.malawi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdjA84lu5QQRKvpwNRMXnnuHFyT2SekRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926095793145:android:9207676a7ed7ab6f1c7b28",
+        "android_client_info": {
+          "package_name": "com.kanyandula.tourmalawi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdjA84lu5QQRKvpwNRMXnnuHFyT2SekRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "926095793145-dd7dk3q8p3okt0k2dg4cfc8lms4nit19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

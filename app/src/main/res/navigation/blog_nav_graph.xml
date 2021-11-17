@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/blog_nav_graph"
+    android:label="Blogs"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.kanyandula.malawi.ui.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_bookMarkFragment"
+            app:destination="@id/bookMarkFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_blogFragment"
+            app:destination="@id/blogFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookMarkFragment"
+        android:name="com.kanyandula.malawi.ui.BookMarkFragment"
+        android:label="BookMark"
+        tools:layout="@layout/fragment_book_mark" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.kanyandula.malawi.ui.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/blogFragment"
+        android:name="com.kanyandula.malawi.ui.BlogFragment"
+        android:label="Blogs"
+        tools:layout="@layout/fragment_blog">
+        <argument
+            android:name="blogs"
+            app:argType="com.kanyandula.malawi.data.models.Blog" />
+
+    </fragment>
+</navigation>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Malawi</string>
+    <string name="updated_on_july_23_2021">Updated on July 23, 2021</string>
+    <string name="ephraim_kanyandula">Ephraim Kanyandula</string>
+    <string name="title">The Title of a Blog</string>
+    <string name="blog_image">blog image</string>
+    <string name="fail_to_connect">Fail to connect</string>
+    <string name="retry">Retry</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="image_detail">Image Detail</string>
+    <string name="title_text">Title </string>
+    <string name="book_your_trip">Book Your Trip</string>
+    <string name="about">About</string>
+    <string name="rating">Rating</string>
+    <string name="description">Mughal Gardens which have truly changed the face of the Mughal Empire is one of the most popular and the most visited tourist attractions of Srinagar.</string>
+    <string name="book_mark">book mark</string>
+</resources>
