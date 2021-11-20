@@ -51,9 +51,7 @@ class BlogAdapter : RecyclerView.Adapter<BlogAdapter.BlogViewHolder>() {
 
     private var onItemClickListener: ((Blog) -> Unit)? = null
 
-    interface OnItemClickListener {
-        fun onItemClick(blog: Blog)
-    }
+
 
     override fun onBindViewHolder(holder: BlogViewHolder, position: Int) {
         val blog = differ.currentList[position]

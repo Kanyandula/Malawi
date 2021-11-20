@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 
 
     lateinit var viewModel: BlogViewModel
+
     private lateinit var  navController: NavController
 
 

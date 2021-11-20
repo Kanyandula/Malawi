@@ -1,112 +1,104 @@
 package com.kanyandula.malawi.ui
 
-import android.util.Log
-import androidx.lifecycle.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.kanyandula.malawi.data.BlogResponse
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.kanyandula.malawi.data.models.Blog
-import com.kanyandula.malawi.utils.Resource
-import kotlinx.coroutines.Dispatchers
+import com.kanyandula.malawi.repository.FeedRepository
+import com.kanyandula.malawi.utils.DispatcherProvider
+import com.kanyandula.malawi.utils.Resource1
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.io.IOException
-import java.lang.Exception
+import com.kanyandula.malawi.utils.Resource1.Error as Error1
 
-class NewViewModel : ViewModel() {
+class NewViewModel(
+    private val blogRepository: FeedRepository,
+    private val dispatchers: DispatcherProvider
+) : ViewModel() {
 
-    val database = FirebaseDatabase.getInstance().reference
-    var  blogList = ArrayList<Blog>()
-    val  blogList1 = MutableLiveData<Resource<List<Blog>>>()
-    val _blogList : LiveData<Resource<List<Blog>>> =blogList1
-
-
-    init {
-
-        getBlogs( "")
-
+    sealed class BlogEvent {
+        class Success(val resultText: String): BlogEvent()
+        class Failure(val errorText: String): BlogEvent()
+        object Loading : BlogEvent()
+        object Empty : BlogEvent()
     }
 
-    fun getBlogs(KEYVALUE: String?) = viewModelScope.launch {
-        getPosts(KEYVALUE)
-    }
+    private val _feed = MutableStateFlow<BlogEvent>(BlogEvent.Empty)
+    val feed: StateFlow<BlogEvent> = _feed
 
 
-    private  fun getPosts(KEYVALUE: String?) {
 
-        blogList1.postValue(Resource.loading(null))
-                val postListener = object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (snapshot in snapshot.children) {
-                            val res = snapshot.getValue(Blog::class.java)
-                            Log.d("dataAdd", "Adding: ${res?.userName}")
-                          //  blogList1.add(res!!)
-                        }
+    /*******************************************************************************/
+    private val eventChannel = Channel<Event>()
+    val events = eventChannel.receiveAsFlow()
 
-                    }
+    private val refreshTriggerChannel = Channel<Refresh>()
+    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
 
-                    override fun onCancelled(error: DatabaseError) {
-                        // Getting Post failed, log a message
-                        Log.w("readList", "loadPost:onCancelled", error.toException())
-                        throw error.toException()
-                    }
-                }
-                    try {
-            if (KEYVALUE != null) {
-                database.child("Blog").child(KEYVALUE).addValueEventListener(postListener)
-            } else {
-               // blogList1.postValue(Resource.success())
-            }
+    var pendingScrollToTopAfterRefresh = false
 
-        }catch (t: Throwable){
-            when(t){
+    private val _blogFeedLiveData = MutableLiveData<List<Blog>>()
 
-                is IOException ->   blogList1.postValue(Resource.error(
-                    "error", null))
-            }
+    fun getBlogFeed()= blogRepository.fetchFeed(_blogFeedLiveData)
 
+  //  val blogFeed = refreshTrigger.flatMapLatest { refresh ->
+//       blogRepository.fetchFeed(
+//           refresh == Refresh.FORCE,
+//           onFetchSuccess = {
+//             pendingScrollToTopAfterRefresh = true
+//                         },
+//           onFetchFailed = { t ->
+//               viewModelScope.launch { eventChannel.send(Event.ShowErrorMessage(t)) }
+//           }
+//       )
+  //  }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+
+
+
+    //{
+//        viewModelScope.launch(dispatchers.io){
+//        _feed.value =BlogEvent.Loading
+//            when(val blogResponse = blogRepository.fetchFeed(_blogFeedLiveData)){
+//                is Resource1.Error -> _feed.value = BlogEvent.Failure(blogResponse.message!!)
+//                is
+//
+//            }
+//        }
+
+        enum class Refresh {
+            FORCE, NORMAL
         }
 
-
-            }
-
-
-
-
-
-
-
-    fun getData(KEYVALUE: String?) = liveData(Dispatchers.Main.immediate){
-        val postListener = object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (snapshot in snapshot.children) {
-                    val res = snapshot.getValue(Blog::class.java)
-                    Log.d("dataAdd", "Adding: ${res?.userName}")
-                    blogList.add(res!!)
-                }
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Getting Post failed, log a message
-                Log.w("readList", "loadPost:onCancelled", error.toException())
-                throw error.toException()
-            }
-
-        }
-
-        try {
-            if (KEYVALUE != null) {
-                database.child("Blog").child(KEYVALUE).addValueEventListener(postListener)
-            }
-            emit(Resource.success(blogList))
-        }catch (e: Exception){
-            emit(Resource.error(
-                "error",
-                e.message ?: "Unknown Error"
-            ))
+        sealed class Event {
+            data class ShowErrorMessage(val error: Throwable) : Event()
         }
 
     }
-}
+
+
+
+
+
+
+
+//   private val repository = FeedRepository()
+//
+//    private val _blogFeedLiveData = MutableLiveData<List<Blog>>()
+//    val blogFeedLiveData: LiveData<List<Blog>> = _blogFeedLiveData
+//
+//    fun fetchBlogFeed(){
+//        repository.fetchFeed(_blogFeedLiveData)
+    //}
+
+          //  }
+
+
+
+
+
+
+

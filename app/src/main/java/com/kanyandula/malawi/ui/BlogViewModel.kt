@@ -2,22 +2,27 @@ package com.kanyandula.malawi.ui
 
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.lifecycle.*
 import com.google.android.gms.common.api.Response
+import com.kanyandula.malawi.MalawiBlogApplication
 import com.kanyandula.malawi.data.BlogResponse
 import com.kanyandula.malawi.data.models.Blog
 import com.kanyandula.malawi.repository.BlogRepository
 import com.kanyandula.malawi.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class BlogViewModel(
+
     app: Application,
     private val repository: BlogRepository
 ) : AndroidViewModel(app) {
-    
+
     val blogPosts : MutableLiveData <Resource<BlogResponse>> = MutableLiveData()
     var blogPage = 1
     var blogBlogResponse : BlogResponse? = null
@@ -41,7 +46,7 @@ class BlogViewModel(
             recentlyViewed[0] = blog
         }
     }
-    
+
 
     init {
         getResponseUsingLiveData()
@@ -56,23 +61,39 @@ class BlogViewModel(
 
 
 
-
-     fun getBlogsPost() = viewModelScope.launch {
-
-     }
-
-//    private fun handleBlogPostResponse (response : ) : Resource<BlogResponse>{
-//
-//        if (response.isSuccessful)
-//
-//    }
+    val responseLiveData = liveData(Dispatchers.IO) {
+        emit(repository.getResponseFromRealtimeDatabaseUsingCoroutines())
+    }
 
 
-//    private suspend fun  safeBlogPostCall (){
-//
-//        blogPosts.postValue(Resource.Loading())
-//        val  response = repository.getResponseFromRealtimeDatabaseUsingLiveData()
-//        blogPosts.postValue()
-//    }
+
+    private fun hasInternetConnection(): Boolean {
+        val connectivityManager = getApplication<MalawiBlogApplication>().getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            return when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.activeNetworkInfo?.run {
+                return when(type) {
+                    ConnectivityManager.TYPE_WIFI -> true
+                    ConnectivityManager.TYPE_MOBILE -> true
+                    ConnectivityManager.TYPE_ETHERNET -> true
+                    else -> false
+                }
+            }
+        }
+        return false
+    }
+
+
+
 
 }

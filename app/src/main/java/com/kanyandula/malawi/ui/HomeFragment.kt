@@ -25,13 +25,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
 
-    private val  viewModel: BlogViewModel by activityViewModels()
+    lateinit var viewModel: BlogViewModel
     lateinit var  blogAdapter: BlogAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+       // getResponseUsingCoroutines()
 
         blogAdapter.setOnItemClickListener {
             viewModel.addToRecentlyViedBlogs(it)
@@ -49,7 +50,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         swipe_refresh.setOnRefreshListener {
             swipe_refresh.isRefreshing = true
             getBlogs()
+           // getResponseUsingCoroutines()
         }
+
+
 
 
 
@@ -70,6 +74,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         }
 
+    }
+
+    private fun getResponseUsingCoroutines(){
+        viewModel.responseLiveData.observe(this,{
+            blogAdapter.differ.submitList(it.Blog)
+            swipe_refresh.isRefreshing = false
+            val totalPages = it.totalResults / Constants.QUERY_PAGE_SIZE + 2
+            isLastPage = viewModel.blogPage == totalPages
+            if (isLastPage){
+                list_view.setPadding(0, 0, 0, 0)
+            }
+        })
     }
 
 
