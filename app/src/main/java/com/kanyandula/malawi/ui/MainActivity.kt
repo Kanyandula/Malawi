@@ -2,17 +2,12 @@ package com.kanyandula.malawi.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.kanyandula.malawi.R
-import com.kanyandula.malawi.repository.BlogRepository
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -20,7 +15,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
 
-    lateinit var viewModel: BlogViewModel
 
     private lateinit var  navController: NavController
 
@@ -29,9 +23,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val blogRepository = BlogRepository()
-        val viewModelProviderFactory = BlogViewModelProviderFactory(application, blogRepository)
-        viewModel = ViewModelProvider(this, viewModelProviderFactory).get(BlogViewModel::class.java)
 
        bottomNavigationView.setupWithNavController(blogNavHostFragment.findNavController())
 

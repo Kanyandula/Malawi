@@ -24,15 +24,14 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
-
-    lateinit var viewModel: BlogViewModel
+    private val viewModel: BlogViewModel by viewModels()
     lateinit var  blogAdapter: BlogAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
-       // getResponseUsingCoroutines()
+
 
         blogAdapter.setOnItemClickListener {
             viewModel.addToRecentlyViedBlogs(it)
@@ -50,7 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         swipe_refresh.setOnRefreshListener {
             swipe_refresh.isRefreshing = true
             getBlogs()
-           // getResponseUsingCoroutines()
+
         }
 
 
@@ -58,66 +57,29 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.getResponseUsingLiveData().observe(viewLifecycleOwner, Observer { response ->
-
+            viewModel.responseLiveData
+                .observe(viewLifecycleOwner, Observer { response ->
                 showProgressBar()
                 blogAdapter.differ.submitList(response.Blog)
-                val totalPages = response.totalResults / Constants.QUERY_PAGE_SIZE + 2
-                isLastPage = viewModel.blogPage == totalPages
-                if (isLastPage) {
-                    list_view.setPadding(0, 0, 0, 0)
-                }
-
 
             })
-
-
         }
 
     }
 
-    private fun getResponseUsingCoroutines(){
-        viewModel.responseLiveData.observe(this,{
-            blogAdapter.differ.submitList(it.Blog)
-            swipe_refresh.isRefreshing = false
-            val totalPages = it.totalResults / Constants.QUERY_PAGE_SIZE + 2
-            isLastPage = viewModel.blogPage == totalPages
-            if (isLastPage){
-                list_view.setPadding(0, 0, 0, 0)
-            }
-        })
-    }
 
 
 
     private fun getBlogs(){
-        viewModel.getResponseUsingLiveData().observe(viewLifecycleOwner, {
+        viewModel.responseLiveData
+            .observe(viewLifecycleOwner, {
             blogAdapter.differ.submitList(it.Blog)
             swipe_refresh.isRefreshing = false
-            val totalPages = it.totalResults / Constants.QUERY_PAGE_SIZE + 2
-            isLastPage = viewModel.blogPage == totalPages
-            if (isLastPage){
-                list_view.setPadding(0, 0, 0, 0)
-            }
-
 
         })
     }
 
 
-    private fun getResponseUsingLiveData() {
-
-        viewModel.getResponseUsingLiveData().observe(viewLifecycleOwner, {
-            blogAdapter.differ.submitList(it.Blog)
-            val totalPages = it.totalResults / Constants.QUERY_PAGE_SIZE + 2
-            isLastPage = viewModel.blogPage == totalPages
-            if (isLastPage){
-                list_view.setPadding(0, 0, 0, 0)
-            }
-
-
-        })
-    }
 
 
     private fun hideProgressBar() {
