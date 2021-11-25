@@ -2,17 +2,87 @@ package com.kanyandula.malawi.ui
 
 
 import androidx.lifecycle.*
-import com.kanyandula.malawi.data.models.Blog
+import com.kanyandula.malawi.api.BlogDto
+import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.repository.BlogRepository
-import kotlinx.coroutines.Dispatchers
+import com.kanyandula.malawi.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+
+@HiltViewModel
+class BlogViewModel @Inject constructor(
+    private val repository: BlogRepository
+    ) : ViewModel(), LifecycleObserver {
+
+    private val eventChannel = Channel<Event>()
+    val events = eventChannel.receiveAsFlow()
+
+    private val refreshTriggerChannel = Channel<Refresh>()
+    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
+
+    var pendingScrollToTopAfterRefresh = false
+
+    @ExperimentalCoroutinesApi
+    val blogFeed = refreshTrigger.flatMapLatest { refresh ->
+        repository.getBlogs(
+            refresh == Refresh.FORCE,
+            onFetchSuccess = {
+                pendingScrollToTopAfterRefresh = true
+            },
+            onFetchFailed = { t ->
+                viewModelScope.launch { eventChannel.send(Event.ShowErrorMessage(t)) }
+
+            },
+
+            blogDto = emptyList()
 
 
-class BlogViewModel @JvmOverloads constructor(
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    private val repository: BlogRepository = BlogRepository()
+    init {
+        viewModelScope.launch {
+         repository.deleteNonBookmarkedBlogsOlderThan(
+             System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
+         )
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun onStart() {
+        if (blogFeed.value !is Resource.Loading){
+            viewModelScope.launch {
+                refreshTriggerChannel.send(Refresh.NORMAL)
+            }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun onManualRefresh() {
+        if (blogFeed.value !is Resource.Loading){
+            viewModelScope.launch {
+                refreshTriggerChannel.send(Refresh.FORCE)
+            }
+        }
+    }
+
+    fun onBookmarkClick(blog: Blog){
+        val currentlyBookmarked = blog.isBookmarked
+        val updateBlog = blog.copy( isBookmarked = !currentlyBookmarked)
+        viewModelScope.launch {
+            repository.updateBlogsArticle(updateBlog)
+        }
+    }
 
 
-    ) : ViewModel() {
 
 
 
@@ -37,10 +107,16 @@ class BlogViewModel @JvmOverloads constructor(
 
 
 
-    val responseLiveData = liveData(Dispatchers.IO) {
-        emit(repository.getResponseFromRealtimeDatabaseUsingCoroutines())
+//    val responseLiveData = liveData(Dispatchers.IO) {
+//        emit(repository.getResponseFromRealtimeDatabaseUsingCoroutines())
+//    }
+
+
+    enum class Refresh {
+        FORCE, NORMAL
     }
 
-
-
+    sealed class Event {
+        data class ShowErrorMessage(val error: Throwable) : Event()
+    }
 }

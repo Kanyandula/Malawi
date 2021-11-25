@@ -1,5 +1,9 @@
 package com.kanyandula.malawi
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
-class MalawiBlogApplication : Application()
+@HiltAndroidApp
+class MalawiBlogApplication : Application(){
+
+}

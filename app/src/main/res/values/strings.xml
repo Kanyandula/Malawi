@@ -6,6 +6,8 @@
     <string name="blog_image">blog image</string>
     <string name="fail_to_connect">Fail to connect</string>
     <string name="retry">Retry</string>
+    <string name="could_not_refresh">Could not refresh: %s</string>
+    <string name="unknown_error_occurred">An unknown error occurred</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="image_detail">Image Detail</string>

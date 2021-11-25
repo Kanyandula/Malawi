@@ -5,8 +5,9 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.adapters.BlogAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
 
 

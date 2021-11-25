@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kanyandula.malawi.R
-import com.kanyandula.malawi.data.models.Blog
+import com.kanyandula.malawi.data.Blog
 
 import kotlinx.android.synthetic.main.blog_list_item.view.*
 
