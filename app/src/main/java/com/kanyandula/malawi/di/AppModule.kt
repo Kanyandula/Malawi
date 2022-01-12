@@ -3,6 +3,7 @@ package com.kanyandula.malawi.di
 
 import android.app.Application
 import androidx.room.Room
+
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.kanyandula.malawi.data.BlogDataBase
