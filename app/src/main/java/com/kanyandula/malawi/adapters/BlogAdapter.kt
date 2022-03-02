@@ -1,6 +1,7 @@
 package com.kanyandula.malawi.adapters
 
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.ui.OnItemClickAction
 
 import kotlinx.android.synthetic.main.blog_list_item.view.*
+import java.lang.ref.WeakReference
 
 
-class BlogAdapter : RecyclerView.Adapter<BlogAdapter.BlogViewHolder>() {
+class BlogAdapter(
+
+) : RecyclerView.Adapter<BlogAdapter.BlogViewHolder>() {
+
 
     inner class BlogViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
 
@@ -42,11 +48,17 @@ class BlogAdapter : RecyclerView.Adapter<BlogAdapter.BlogViewHolder>() {
                 parent,
                 false
             )
+
         )
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
+    }
+
+    fun dataSetChanged(newDataSet: List<Blog>) {
+        blogs = newDataSet
+        notifyDataSetChanged()
     }
 
     private var onItemClickListener: ((Blog) -> Unit)? = null

@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Malawi</string>
+    <string name="email_address">e-mail address</string>
+    <string name="password">password</string>
+    <string name="sign_in">sign in</string>
+    <string name="sign_in_message">Don\'t have an account?</string>
+    <string name="create_one"> <u>Create one</u> </string>
+    <string name="sign_up">sign up</string>
+    <string name="sign_up_message">Create your account</string>
     <string name="updated_on_july_23_2021">Updated on July 23, 2021</string>
     <string name="ephraim_kanyandula">Ephraim Kanyandula</string>
     <string name="title">The Title of a Blog</string>
@@ -8,6 +15,11 @@
     <string name="retry">Retry</string>
     <string name="could_not_refresh">Could not refresh: %s</string>
     <string name="unknown_error_occurred">An unknown error occurred</string>
+    <string name="enter_both_email_and_password">Enter both e-mail and password</string>
+    <string name="your_email_address_is_invalid">Your e-mail address is invalid</string>
+    <string name="password_too_short">Your password should be at least 6 characters long</string>
+    <string name="failed_to_sign_in">Failed to sign in</string>
+    <string name="user_can_not_be_created">Unfortunately, user can not be created</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="image_detail">Image Detail</string>

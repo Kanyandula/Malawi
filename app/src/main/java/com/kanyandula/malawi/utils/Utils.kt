@@ -1,4 +1,4 @@
-package com.codinginflow.mvvmnewsapp.util
+package com.kanyandula.malawi.utils
 
 import android.view.View
 import androidx.appcompat.widget.SearchView

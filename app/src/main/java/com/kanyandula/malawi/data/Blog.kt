@@ -1,24 +1,26 @@
 package com.kanyandula.malawi.data
 
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 
 @Entity(tableName = "blog_articles")
 data class Blog(
-    val date: String ,
-    val desc: String ,
-    val rank: String,
-    val image: String,
-    @PrimaryKey val time:String,
-    val title: String ,
-    val uid: String ,
-    val userName: String ,
-    val isBookmarked: Boolean,
-    val updatedAt: Long = System.currentTimeMillis()
+    val date: String ?= null,
+    val desc: String ?= null,
+    @PrimaryKey @NonNull
+    val image: String = "",
+    val time:String ?= null,
+    val title: String ?= null,
+    val uid: String ?= null,
+    val userName: String ?= null,
 
-)
+    ): Serializable{
+
+}
 
 @Entity(tableName = "blog_feed")
 data class BlogFeed(

@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_homeFragment_to_blogFragment"
             app:destination="@id/blogFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
 
     <fragment
@@ -31,13 +34,45 @@
         android:id="@+id/searchFragment"
         android:name="com.kanyandula.malawi.ui.SearchFragment"
         android:label="Search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_blogFragment"
+            app:destination="@id/blogFragment" />
+    </fragment>
     <fragment
         android:id="@+id/blogFragment"
-        android:name="com.kanyandula.malawi.ui.BlogFragment"
+        android:name="com.kanyandula.malawi.ui.BlogDetailFragment"
         android:label="Blogs"
-        tools:layout="@layout/fragment_blog">
-
+        tools:layout="@layout/fragment_blog_detail">
+        <argument
+            android:name="blogs"
+            app:argType="com.kanyandula.malawi.data.Blog" />
 
     </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.kanyandula.malawi.ui.authentication.SignInFragment"
+        android:label="SignInFragment"
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_postBlogFragment"
+            app:destination="@id/postBlogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postBlogFragment"
+        android:name="com.kanyandula.malawi.ui.PostBlogFragment"
+        android:label="fragment_post_blog"
+        tools:layout="@layout/fragment_post_blog" >
+        <action
+            android:id="@+id/action_postBlogFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_postBlogFragment_to_addBlogFragment"
+            app:destination="@id/addBlogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addBlogFragment"
+        android:name="com.kanyandula.malawi.ui.add.AddBlogFragment"
+        android:label="fragment_add_blog"
+        tools:layout="@layout/fragment_add_blog" />
 </navigation>

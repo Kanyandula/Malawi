@@ -8,6 +8,13 @@
         android:title="Search"
         android:icon="@drawable/ic__36_zoom" />
 
+    <item
+        android:id="@+id/signInFragment"
+        android:icon="@drawable/ic_add_circle_24"
+        android:title="Post"
+
+
+        />
 
 
     <item android:id="@+id/bookMarkFragment"
