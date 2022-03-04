@@ -46,7 +46,7 @@ interface AddFragmentViewModelInterface {
         if (addingToDatabaseResult) {
             Toast.makeText(context, message, Toast.LENGTH_LONG)
                 .show()
-            Navigation.findNavController(view).navigate(R.id.action_signInFragment_to_postBlogFragment)
+            Navigation.findNavController(view).navigate(R.id.action_addBlogFragment_to_postBlogFragment)
         } else {
             Toast.makeText(context, "An error occurred", Toast.LENGTH_LONG).show()
         }

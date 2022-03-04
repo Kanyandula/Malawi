@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="124dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -33,12 +33,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="208dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/addTitle">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputDescription"
@@ -49,26 +49,30 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/addMovie_addButton"
+        android:id="@+id/addBlog_Button"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginHorizontal="80dp"
-        android:layout_marginTop="250dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
+        android:layout_marginBottom="150dp"
         android:text="Post"
         android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addMovie_loadingSection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addDescription" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/addMovie_loadingSection"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="372dp"
+        android:layout_height="136dp"
+        android:layout_marginTop="32dp"
         android:background="@color/white_transparent"
         android:elevation="100dp"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addDescription">
 
         <ProgressBar
             android:id="@+id/addMovie_progressBar"

@@ -63,16 +63,21 @@
         android:name="com.kanyandula.malawi.ui.PostBlogFragment"
         android:label="fragment_post_blog"
         tools:layout="@layout/fragment_post_blog" >
-        <action
-            android:id="@+id/action_postBlogFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+
         <action
             android:id="@+id/action_postBlogFragment_to_addBlogFragment"
             app:destination="@id/addBlogFragment" />
+        <action
+            android:id="@+id/action_postBlogFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
     <fragment
         android:id="@+id/addBlogFragment"
         android:name="com.kanyandula.malawi.ui.add.AddBlogFragment"
         android:label="fragment_add_blog"
-        tools:layout="@layout/fragment_add_blog" />
+        tools:layout="@layout/fragment_add_blog" >
+        <action
+            android:id="@+id/action_addBlogFragment_to_postBlogFragment"
+            app:destination="@id/postBlogFragment" />
+    </fragment>
 </navigation>

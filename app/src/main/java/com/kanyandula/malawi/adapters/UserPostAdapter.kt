@@ -22,7 +22,7 @@ class UserPostAdapter(
     RecyclerView.Adapter<MoviesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.blog_list_item, parent, false)
+        val view = LayoutInflater.from(context).inflate(R.layout.user_post_item, parent, false)
         return MoviesViewHolder(view)
     }
 
@@ -61,7 +61,7 @@ class UserPostAdapter(
 }
 
 class MoviesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val item = view.findViewById<ConstraintLayout>(R.id.blog_item)
+    val item = view.findViewById<ConstraintLayout>(R.id.post_item)
 
     val title = view.findViewById<TextView>(R.id.blog_title)
     val userName = view.findViewById<TextView>(R.id.blog_author)

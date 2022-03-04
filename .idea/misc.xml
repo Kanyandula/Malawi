@@ -4,8 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/drawable-v24/ic__17_home.xml" value="0.1325" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/drawable-v24/ic_baseline_logout_24.xml" value="0.155" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/activity_main.xml" value="0.11458333333333333" />
-        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/blog_list_item.xml" value="0.13768115942028986" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/blog_list_item.xml" value="0.2857142857142857" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_add_blog.xml" value="0.1" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_blog.xml" value="0.13768115942028986" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_blog_detail.xml" value="0.14285714285714285" />
@@ -13,9 +14,12 @@
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_post_blog.xml" value="0.16354166666666667" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_search.xml" value="0.13768115942028986" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_sign_in.xml" value="0.1" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_sign_up.xml" value="0.1" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/item_error_message.xml" value="0.11820652173913043" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/user_post_item.xml" value="0.12092391304347826" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/menu/bottom_nav_menu.xml" value="0.10989583333333333" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/menu/menu_search.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/menu/sign_out.xml" value="0.17916666666666667" />
       </map>
     </option>
   </component>

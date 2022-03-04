@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.ktx.Firebase
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +22,7 @@ class PostBlogViewModel @Inject constructor(
 
 
 
-    private val user = databaseAuth.uid.toString()
+     val user = databaseAuth.uid.toString()
 
     var blogs = MutableLiveData<List<Blog>>()
     val itemDeleted = MutableLiveData<Boolean>(false)
@@ -48,6 +50,13 @@ class PostBlogViewModel @Inject constructor(
         }
     }
 
+    fun signOut() {
+       Firebase.auth.signOut()
+
+
+    }
+
+
 
     fun deleteMovie(id: String?) {
         itemDeleted.value = false
@@ -62,5 +71,6 @@ class PostBlogViewModel @Inject constructor(
                 }
             }
     }
+
 
 }

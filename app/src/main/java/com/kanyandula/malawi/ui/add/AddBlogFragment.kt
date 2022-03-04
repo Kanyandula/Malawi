@@ -26,6 +26,7 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
     @Inject
     lateinit var databaseAuth: FirebaseAuth
 
+
     private lateinit var loadingSection: ConstraintLayout
     private lateinit var noTitleMessage: String
     private lateinit var blogAddedMessage: String
@@ -39,7 +40,10 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun initView() {
-       addButton.setOnClickListener {
+
+        loadingSection = addMovie_loadingSection
+        blogAddedMessage = "Blog Added"
+        addBlog_Button.setOnClickListener {
            val title = inputTittle.text.toString()
            val desc = inputDescription.text.toString()
            val date = Calendar.getInstance().time.toString()
@@ -47,6 +51,7 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
            val uid = databaseAuth.uid.toString()
 
            val blog = Blog(title,desc,date, userName, uid)
+
            viewModel.addToDatabase(blog)
        }
     }
