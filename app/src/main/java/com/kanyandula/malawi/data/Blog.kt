@@ -9,14 +9,14 @@ import java.io.Serializable
 
 @Entity(tableName = "blog_articles")
 data class Blog(
-    val date: String ?= null,
-    val desc: String ?= null,
+    val date: String? = null ,
+    val title: String? = null,
+    val desc: String? = null,
     @PrimaryKey @NonNull
     val image: String = "",
-    val time:String ?= null,
-    val title: String ?= null,
-    val uid: String ?= null,
-    val userName: String ?= null,
+    val time: String? = null,
+    val uid: String? = null,
+    val userName: String? = null,
 
     ): Serializable{
 

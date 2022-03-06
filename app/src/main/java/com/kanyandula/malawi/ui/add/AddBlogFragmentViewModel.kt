@@ -44,7 +44,7 @@ class AddBlogFragmentViewModel @Inject constructor(
         val uid  = item.uid
         val userName = item.userName
 
-        val blog = Blog(itemId, title, desc!!,date,uid,userName)
+        val blog = Blog(itemId, title, desc!!,date!!, uid,userName)
 
         if(validation(blog)){
 

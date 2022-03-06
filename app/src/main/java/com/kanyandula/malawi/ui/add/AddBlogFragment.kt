@@ -6,6 +6,8 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.interfaces.AddFragmentViewModelInterface
