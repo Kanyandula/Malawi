@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.kanyandula.malawi.R
+import com.kanyandula.malawi.databinding.FragmentBlogDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_blog_detail.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,34 +18,56 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class BlogDetailFragment : Fragment(R.layout.fragment_blog_detail) {
 
+    companion object {
+        const val ARGS_KEY = "blogs"
+    }
+
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val  viewModel: BlogViewModel by viewModels()
+
+    private var currentBinding: FragmentBlogDetailBinding? = null
+    private val binding get() = currentBinding!!
 
      private val args by navArgs<BlogDetailFragmentArgs>()
      override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
           super.onViewCreated(view, savedInstanceState)
+         currentBinding = FragmentBlogDetailBinding.bind(view)
+
+         val blogs = args.blogs
 
 
-         favoriteImage.setOnClickListener {
+
+         binding.apply {
+
+             Glide.with(requireContext()).load(blogs.image).into(imageView)
+             textTitle.apply {
+                 text = blogs.title
+             }
+
+
+             textDescription.apply {
+                 text = blogs.desc
+                 movementMethod = ScrollingMovementMethod()
+
+             }
+
+             favoriteImage.setOnClickListener {
+
+             }
+
+
 
          }
-
-              val blogs = args.blogs
-         Glide.with(this).load(blogs.image).into(imageView)
-          textTitle.apply {
-              text  = blogs.title
-          }
-
-
-          textDescription.apply {
-              text = blogs.desc
-              movementMethod = ScrollingMovementMethod()
-
-          }
 
 
 
 
      }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        currentBinding = null
+    }
 
 }

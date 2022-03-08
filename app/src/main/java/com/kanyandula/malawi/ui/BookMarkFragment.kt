@@ -15,7 +15,7 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        blogAdapter = BlogAdapter()
+
 
 
     }

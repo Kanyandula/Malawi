@@ -63,7 +63,7 @@ class BlogViewModel @Inject constructor(
 
 
     private val maxRecentlyViewed = 5
-    val recentlyViewed = ArrayList<Blog>(maxRecentlyViewed)
+    private val recentlyViewed = ArrayList<Blog>(maxRecentlyViewed)
 
     fun addToRecentlyViedBlogs(blog: Blog){
         val existingIndex = recentlyViewed.indexOf(blog)

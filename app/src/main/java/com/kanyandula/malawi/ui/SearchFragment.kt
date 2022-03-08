@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.kanyandula.malawi.utils.showSnackbar
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.adapters.BlogAdapter
+import com.kanyandula.malawi.databinding.FragmentSearchBinding
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.exhaustive
 import com.kanyandula.malawi.utils.onQueryTextSubmit
@@ -36,71 +37,88 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
 
     private val  viewModel: SearchViewModel by viewModels()
-    lateinit var  blogAdapter : BlogAdapter
+
+    private var currentBinding: FragmentSearchBinding? = null
+    private val binding get() = currentBinding!!
+
 
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        setupRecyclerView()
 
-        blogAdapter.setOnItemClickListener {
-            viewModel.addToRecentlyViedBlogs(it)
-            val bundle = Bundle().apply {
-                putSerializable("blogs",it)
+         currentBinding = FragmentSearchBinding.bind(view)
+
+        val blogAdapter = BlogAdapter(
+            onItemClick = {
+                viewModel.addToRecentlyViedBlogs(it)
+                val bundle = Bundle().apply {
+                    putSerializable("blogs", it)
+                }
+                findNavController().navigate(
+                    R.id.action_searchFragment_to_blogFragment,
+                    bundle
+                )
             }
-            findNavController().navigate(
-                R.id.action_searchFragment_to_blogFragment,
-                bundle
-            )
-        }
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.searchResults.collectLatest { data ->
-                val result = data ?: return@collectLatest
-                swipe_refresh_layout.isRefreshing = result is Resource.Loading
-                result_list.isVisible = !result.data.isNullOrEmpty()
-                button_retry.isVisible = result.error != null && result.data.isNullOrEmpty()
-                blogAdapter.differ.submitList(result.data){
-                    if (viewModel.pendingScrollToTopAfterRefresh){
-                        result_list.scrollToPosition(0)
-                        viewModel.pendingScrollToTopAfterRefresh = false
+        )
+
+        binding.apply {
+            resultList.apply {
+                adapter = blogAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                //layoutManager = LinearLayoutManager(context)
+                setHasFixedSize(true)
+                itemAnimator?.changeDuration = 0
+            }
+
+
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.searchResults.collectLatest { data ->
+                    val result = data ?: return@collectLatest
+                    swipeRefreshLayout.isRefreshing = result is Resource.Loading
+                    resultList.isVisible = !result.data.isNullOrEmpty()
+                    buttonRetry.isVisible = result.error != null && result.data.isNullOrEmpty()
+                    blogAdapter.submitList(result.data) {
+                        if (viewModel.pendingScrollToTopAfterRefresh) {
+                            resultList.scrollToPosition(0)
+                            viewModel.pendingScrollToTopAfterRefresh = false
+                        }
                     }
                 }
             }
-        }
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.events.collect{ event ->
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.events.collect { event ->
 
-                when(event){
-                    is SearchViewModel.Event.ShowErrorMessage ->
-                        showSnackbar(
-                            getString(
-                                R.string.could_not_refresh
+                    when (event) {
+                        is SearchViewModel.Event.ShowErrorMessage ->
+                            showSnackbar(
+                                getString(
+                                    R.string.could_not_refresh
+                                )
                             )
-                        )
 
-                }.exhaustive
+                    }.exhaustive
+
+                }
 
             }
 
-        }
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.hasCurrentQuery.collect { hasCurrentQuery ->
+                    textViewInstructions.isVisible = !hasCurrentQuery
+                    swipeRefreshLayout.isVisible = hasCurrentQuery
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.hasCurrentQuery.collect { hasCurrentQuery ->
-                text_view_instructions.isVisible = !hasCurrentQuery
-                swipe_refresh_layout.isVisible = hasCurrentQuery
-
-                if (!hasCurrentQuery){
-                    result_list.isVisible = false
+                    if (!hasCurrentQuery) {
+                        result_list.isVisible = false
+                    }
                 }
             }
+
+
         }
-
-
-
 
     }
 
@@ -112,7 +130,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val searchItem = menu.findItem(R.id.action_search)
         val searchView = searchItem?.actionView as SearchView
 
-        searchView. onQueryTextSubmit(){ query ->
+        searchView. onQueryTextSubmit{ query ->
             val searchText = query.trim()
             viewModel.onSearchQuerySubmit(searchText)
             searchView.clearFocus()
@@ -121,26 +139,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     }
 
-    private fun subscribeToObservables(){
-        viewModel.blogFeedLiveData.observe(this ){ response ->
 
-            blogAdapter.differ.submitList(response)
-        }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.resultList.adapter = null
+        currentBinding = null
     }
-
-
-
-
-    private fun setupRecyclerView() {
-        blogAdapter = BlogAdapter()
-        result_list.apply {
-            adapter = blogAdapter
-            layoutManager = LinearLayoutManager(context)
-
-        }
-
-    }
-
-
 
 }
