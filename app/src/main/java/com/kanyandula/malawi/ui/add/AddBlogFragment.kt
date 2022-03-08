@@ -1,8 +1,10 @@
 package com.kanyandula.malawi.ui.add
 
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseAuth
@@ -16,6 +18,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_add_blog.*
 import kotlinx.android.synthetic.main.fragment_post_blog.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 
@@ -34,12 +38,14 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
     private lateinit var blogAddedMessage: String
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         setObservers()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun initView() {
 
@@ -49,10 +55,11 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
            val title = inputTittle.text.toString()
            val desc = inputDescription.text.toString()
            val date = Calendar.getInstance().time.toString()
-           val userName = databaseAuth.currentUser.toString()
-           val uid = databaseAuth.uid.toString()
+           val userName = databaseAuth.currentUser?.displayName
+            val timestamp = Date().time.toString()
+           val uid = databaseAuth.currentUser?.uid.toString()
 
-           val blog = Blog(title,desc,date, userName, uid)
+           val blog = Blog(title,desc,date, userName!!, uid, timestamp)
 
            viewModel.addToDatabase(blog)
        }

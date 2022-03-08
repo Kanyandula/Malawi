@@ -4,6 +4,7 @@ package com.kanyandula.malawi.data
 import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.database.IgnoreExtraProperties
 import java.io.Serializable
 
 
@@ -17,6 +18,7 @@ data class Blog(
     val time: String? = null,
     val uid: String? = null,
     val userName: String? = null,
+    val timestamp: String? = null
 
     ): Serializable{
 

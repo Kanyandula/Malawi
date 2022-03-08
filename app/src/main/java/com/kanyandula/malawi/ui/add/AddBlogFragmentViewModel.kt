@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import com.kanyandula.malawi.utils.Constants.EMPTY_VALUES
@@ -21,9 +22,9 @@ class AddBlogFragmentViewModel @Inject constructor(
     private var blogRef: DatabaseReference
 ) : ViewModel() {
 
-    private val user: String = databaseAuth.uid.toString()
-    private val mainPath: DatabaseReference = blogRef.child(user).child(BLOG_REF)
-    private var itemId: String = "0"
+    private val user: String = databaseAuth.currentUser?.uid.toString()
+    private val mainPath: DatabaseReference = blogRef.child(user)
+    //private var itemId: String = "0"
 
     val loading = MutableLiveData<Boolean>()
     val validationResult = MutableLiveData<Int>()
@@ -31,24 +32,33 @@ class AddBlogFragmentViewModel @Inject constructor(
 
 
     init {
-        setItemId()
+        //setItemId()
     }
 
     fun  addToDatabase (item: Blog){
 
         loading.value = true
 
-        val title = item.title
-        val desc = item.desc
-        val date = item.date
-        val uid  = item.uid
-        val userName = item.userName
+        val title = item.title.toString()
+        val desc = item.desc.toString()
+        val date = item.date.toString()
+        val uid  = item.uid.toString()
+        val userName = item.userName.toString()
+        val time = item.time.toString()
 
-        val blog = Blog(itemId, title, desc!!,date!!, uid,userName)
+        val blog = Blog(
+            date,
+        title,
+         desc,
+         time,
+        uid,
+         userName
+
+        )
 
         if(validation(blog)){
 
-            mainPath.child(itemId).setValue(blog)
+            mainPath.setValue(blog)
                 .addOnCompleteListener() { task ->
                     if (task.isComplete) {
                         if (task.isSuccessful) {
@@ -64,24 +74,24 @@ class AddBlogFragmentViewModel @Inject constructor(
 
     }
 
-    private fun setItemId() {
-        mainPath
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(error: DatabaseError) {}
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val childrenCount = snapshot.childrenCount
-                        itemId = childrenCount.toString()
-
-                        for (i in 0 until childrenCount) {
-                            val child = snapshot.child(i.toString()).value
-                            if (child.toString() == "null") itemId = i.toString()
-                        }
-                    }
-                }
-            })
-    }
+//    private fun setItemId() {
+//        mainPath
+//            .addValueEventListener(object : ValueEventListener {
+//                override fun onCancelled(error: DatabaseError) {}
+//
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    if (snapshot.exists()) {
+//                        val childrenCount = snapshot.childrenCount
+//                        itemId = childrenCount.toString()
+//
+//                        for (i in 0 until childrenCount) {
+//                            val child = snapshot.child(i.toString()).value
+//                            if (child.toString() == "null") itemId = i.toString()
+//                        }
+//                    }
+//                }
+//            })
+//    }
 
 
     private fun validation(blog: Blog): Boolean {

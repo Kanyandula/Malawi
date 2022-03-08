@@ -3,12 +3,12 @@ package com.kanyandula.malawi.api
 
 
 data class BlogDto (
-    val date: String ,
-    val desc: String ,
-    val image: String,
-    val rank: String,
-    val time:String ,
-    val title: String ,
-    val uid: String ,
-    val userName: String ,
+    val date: String? = null ,
+    val desc: String? = null ,
+    val image: String? = null,
+    val rank: String? = null,
+    val time:String? = null ,
+    val title: String? = null ,
+    val uid: String? = null ,
+    val userName: String? = null ,
         )

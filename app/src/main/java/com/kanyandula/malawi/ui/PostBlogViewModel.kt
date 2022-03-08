@@ -1,12 +1,15 @@
 package com.kanyandula.malawi.ui
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.common.api.Response
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.ktx.Firebase
+import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,33 +25,33 @@ class PostBlogViewModel @Inject constructor(
 
 
 
-     val user = databaseAuth.uid.toString()
+     val user = databaseAuth.currentUser?.uid.toString()
 
     var blogs = MutableLiveData<List<Blog>>()
     val itemDeleted = MutableLiveData<Boolean>(false)
 
-     fun fetchMovies() {
+     fun fetchMovies(): LiveData<BlogResponse> {
+         val mutableLiveData = MutableLiveData<BlogResponse>()
+         blogRef.get().addOnCompleteListener { task ->
+         val response = BlogResponse()
+             if (task.isSuccessful) {
+                 val result = task.result
+                 result.let {
+                     if (result != null) {
+                         response.blog = result.children.map {
+                             it.getValue(Blog::class.java)!!
+                         }
+                     }
+                     }
+                 } else{
+                 response.exception = task.exception
+                 }
+             mutableLiveData.value = response
+             }
+           return  mutableLiveData
 
-         blogRef.child(user).child(BLOG_REF).get().addOnSuccessListener {
-            val blogList: MutableList<Blog> = mutableListOf()
-            var lastChild = it.childrenCount
-
-            var i = 0
-            while (i < lastChild) {
-                if (!it.child(i.toString()).exists()) {
-                    lastChild++
-                }
-                i++
-            }
-
-            for (j in 0 until lastChild) {
-                val singleBlog = it.child(j.toString()).getValue(Blog::class.java)
-                singleBlog?.let { blog -> blogList.add(blog) }
-            }
-
-            blogs.value = blogList
         }
-    }
+
 
     fun signOut() {
        Firebase.auth.signOut()
@@ -60,7 +63,7 @@ class PostBlogViewModel @Inject constructor(
 
     fun deleteMovie(id: String?) {
         itemDeleted.value = false
-        blogRef.child(user).child(BLOG_REF).child(id.toString())
+        blogRef.child(user).child(id.toString())
             .removeValue()
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
