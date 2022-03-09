@@ -4,6 +4,7 @@ package com.kanyandula.malawi.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -46,16 +47,19 @@ class BlogRepository @Inject constructor(
 
             saveFetchResult = {
                 serverBlogArticles ->
-
                 val  bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
                 val blogPostArticles =
                     serverBlogArticles.map { serverBlogArticle ->
 
                         val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
-                            bookmarkedArticle.image == serverBlogArticle.get().image
-
+                            bookmarkedArticle.image == serverBlogArticle.image
                         }
+
+                        Blog(
+                            time = serverBlogArticle.
+                        )
+
 
                     }
 
