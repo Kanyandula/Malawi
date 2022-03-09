@@ -59,6 +59,7 @@ class AddBlogFragment : Fragment(R.layout.fragment_add_blog) , AddFragmentViewMo
             val timestamp = Date().time.toString()
            val uid = databaseAuth.currentUser?.uid.toString()
 
+
            val blog = Blog(title,desc,date, userName!!, uid, timestamp)
 
            viewModel.addToDatabase(blog)

@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
@@ -59,6 +58,15 @@ class BlogViewModel @Inject constructor(
         }
     }
 
+    fun onBookmarkClick(blog: Blog) {
+        val currentlyBookmarked = blog.favorite
+        val updatedArticle = blog.copy(favorite = !currentlyBookmarked!!)
+        viewModelScope.launch {
+            repository.updateBlogs(updatedArticle)
+
+        }
+    }
+
 
 
 
@@ -95,6 +103,10 @@ class BlogViewModel @Inject constructor(
     sealed class Event {
         data class ShowErrorMessage(val error: Throwable) : Event()
     }
+
+//    fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
+//        repository.updateFavoriteStatus(id, isFavorite)
+//    }
 
     fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
         repository.updateFavoriteStatus(id, isFavorite)

@@ -9,6 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.BlogDataBase
+import com.kanyandula.malawi.data.HomeArticles
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import com.kanyandula.malawi.utils.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,9 +27,11 @@ import javax.inject.Inject
 
 
 class BlogRepository @Inject constructor(
-    private var blogRef: DatabaseReference
+    private var blogRef: DatabaseReference,
+    private  val blogDataBase: BlogDataBase
 ): FirebaseBlogDao {
 
+    private  val blogDao = blogDataBase.blogDao()
 
 
 
@@ -152,6 +156,22 @@ class BlogRepository @Inject constructor(
                 }
 
             })
+    }
+
+    fun getAllBookmarkedBlogs(): Flow<List<Blog>> =
+        blogDao.getAllBookmarkedBlogs()
+
+    suspend fun updateBlogs(blogs: Blog){
+        blogDao.upsert(blogs)
+
+    }
+
+    suspend fun resetAllBookmarks() {
+        blogDao.resetAllBookmarks()
+    }
+
+    suspend fun deleteNonBookmarkedArticlesOlderThan(timestampInMillis: Long) {
+        blogDao.deleteNonBookmarkedArticlesOlderThan(timestampInMillis)
     }
 
 }

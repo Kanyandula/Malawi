@@ -8,6 +8,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.kanyandula.malawi.data.BlogDataBase
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.Module
 import dagger.Provides
@@ -42,12 +43,12 @@ object AppModule {
 
 
 
-//    @Provides
-//    @Singleton
-//    fun provideDatabase(app: Application): BlogDataBase =
-//        Room.databaseBuilder(app, BlogDataBase::class.java, "blog_article_database")
-//            .fallbackToDestructiveMigration()
-//            .build()
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): BlogDataBase =
+        Room.databaseBuilder(app, BlogDataBase::class.java, "blog_article_database")
+            .fallbackToDestructiveMigration()
+            .build()
 
 
 

@@ -9,6 +9,7 @@ import com.kanyandula.malawi.databinding.BlogListItemBinding
 
 class BlogAdapter(
     private val onItemClick: (Blog) -> Unit,
+    private val onBookmarkClick: (Blog) -> Unit
 ): ListAdapter<Blog, BlogViewHolder>(BlogArticleComparator()) {
 
 
@@ -20,6 +21,12 @@ class BlogAdapter(
                 val article = getItem(position)
                 if (article != null) {
                     onItemClick(article)
+                }
+            },
+            onBookmarkClick = { position ->
+                val article = getItem(position)
+                if (article != null) {
+                    onBookmarkClick(article)
                 }
             }
         )

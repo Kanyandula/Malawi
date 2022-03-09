@@ -52,6 +52,14 @@ class SearchViewModel @Inject constructor(
         pendingScrollToTopAfterNewQuery = true
     }
 
+    fun  onBookMarkClick (blog: Blog){
+        val currentBookmarked = blog.favorite
+        val updateBlog = blog.copy( favorite = !currentBookmarked!!)
+        viewModelScope.launch {
+            repository.updateBlogs(updateBlog)
+        }
+    }
+
 
     private val _blogFeedLiveData = MutableLiveData<List<Blog>>()
     val blogFeedLiveData : LiveData<List<Blog>> = _blogFeedLiveData

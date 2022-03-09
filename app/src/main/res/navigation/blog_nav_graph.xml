@@ -29,7 +29,11 @@
         android:id="@+id/bookMarkFragment"
         android:name="com.kanyandula.malawi.ui.BookMarkFragment"
         android:label="BookMark"
-        tools:layout="@layout/fragment_book_mark" />
+        tools:layout="@layout/fragment_book_mark" >
+        <action
+            android:id="@+id/action_bookMarkFragment_to_blogFragment"
+            app:destination="@id/blogFragment" />
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.kanyandula.malawi.ui.SearchFragment"

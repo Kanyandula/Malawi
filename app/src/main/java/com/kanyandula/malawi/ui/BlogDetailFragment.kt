@@ -18,10 +18,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class BlogDetailFragment : Fragment(R.layout.fragment_blog_detail) {
 
-    companion object {
-        const val ARGS_KEY = "blogs"
-    }
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val  viewModel: BlogViewModel by viewModels()
@@ -51,11 +47,6 @@ class BlogDetailFragment : Fragment(R.layout.fragment_blog_detail) {
                  movementMethod = ScrollingMovementMethod()
 
              }
-
-             favoriteImage.setOnClickListener {
-
-             }
-
 
 
          }

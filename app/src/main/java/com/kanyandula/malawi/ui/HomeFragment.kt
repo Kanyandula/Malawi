@@ -43,6 +43,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     R.id.action_homeFragment_to_blogFragment,
                     bundle
                 )
+            },
+            onBookmarkClick = { blog ->
+                viewModel.onBookmarkClick(blog)
+
             }
 
         )

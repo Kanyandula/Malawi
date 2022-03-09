@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.repository.BlogRepository
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import com.kanyandula.malawi.utils.Constants.EMPTY_VALUES
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddBlogFragmentViewModel @Inject constructor(
     databaseAuth: FirebaseAuth,
-    private var blogRef: DatabaseReference
+    private var blogRef: DatabaseReference,
+    private var repository: BlogRepository
 ) : ViewModel() {
 
     private val user: String = databaseAuth.currentUser?.uid.toString()
@@ -45,6 +47,7 @@ class AddBlogFragmentViewModel @Inject constructor(
         val uid  = item.uid.toString()
         val userName = item.userName.toString()
         val time = item.time.toString()
+        val favorite = item.favorite.toString()
 
         val blog = Blog(
             date,
@@ -52,8 +55,11 @@ class AddBlogFragmentViewModel @Inject constructor(
          desc,
          time,
         uid,
-         userName
+         userName,
+         favorite!! ,
 
+            "",
+            false
         )
 
         if(validation(blog)){
@@ -101,5 +107,7 @@ class AddBlogFragmentViewModel @Inject constructor(
             false
         } else true
     }
-
+    fun updateFavoriteStatus(id: String, favorite: Boolean) {
+        repository.updateFavoriteStatus(id, favorite)
+    }
 }

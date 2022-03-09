@@ -60,6 +60,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                     R.id.action_searchFragment_to_blogFragment,
                     bundle
                 )
+            },
+            onBookmarkClick = { blog ->
+                viewModel.onBookMarkClick(blog)
             }
 
         )
