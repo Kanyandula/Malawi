@@ -20,9 +20,6 @@
         <action
             android:id="@+id/action_homeFragment_to_blogFragment"
             app:destination="@id/blogFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
     </fragment>
 
     <fragment
@@ -53,35 +50,5 @@
             app:argType="com.kanyandula.malawi.data.Blog" />
 
     </fragment>
-    <fragment
-        android:id="@+id/signInFragment"
-        android:name="com.kanyandula.malawi.ui.authentication.SignInFragment"
-        android:label="SignInFragment"
-        tools:layout="@layout/fragment_sign_in">
-        <action
-            android:id="@+id/action_signInFragment_to_postBlogFragment"
-            app:destination="@id/postBlogFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/postBlogFragment"
-        android:name="com.kanyandula.malawi.ui.PostBlogFragment"
-        android:label="fragment_post_blog"
-        tools:layout="@layout/fragment_post_blog" >
 
-        <action
-            android:id="@+id/action_postBlogFragment_to_addBlogFragment"
-            app:destination="@id/addBlogFragment" />
-        <action
-            android:id="@+id/action_postBlogFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/addBlogFragment"
-        android:name="com.kanyandula.malawi.ui.add.AddBlogFragment"
-        android:label="fragment_add_blog"
-        tools:layout="@layout/fragment_add_blog" >
-        <action
-            android:id="@+id/action_addBlogFragment_to_postBlogFragment"
-            app:destination="@id/postBlogFragment" />
-    </fragment>
 </navigation>

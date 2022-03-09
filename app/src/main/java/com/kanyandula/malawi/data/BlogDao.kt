@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BlogDao {
 
-//        @Query("SELECT * FROM blog_articles INNER JOIN  blog_articles ON title =  date ")
-//        fun getAllBlogFeed(): Flow<List<Blog>>
+        @Query("SELECT * FROM   blog_articles ORDER BY timestamp  ")
+        fun getAllBlogFeed(): Flow<List<Blog>>
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
         fun getAllBookmarkedBlogs(): Flow<List<Blog>>

@@ -34,4 +34,5 @@ inline fun <ResultType, RequestType> networkBoundResource(
     } else {
         query().collect { send(Resource.Success(it)) }
     }
+
 }

@@ -10,16 +10,12 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.data.BlogDataBase
-import com.kanyandula.malawi.data.HomeArticles
-import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import com.kanyandula.malawi.utils.Resource
+import com.kanyandula.malawi.utils.networkBoundResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import javax.inject.Inject
@@ -28,45 +24,50 @@ import javax.inject.Inject
 
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
-    private  val blogDataBase: BlogDataBase
-): FirebaseBlogDao {
+    private  val blogDataBase: BlogDataBase,
+    private  val firebaseApi: FirebaseApi
+) {
 
     private  val blogDao = blogDataBase.blogDao()
 
+    fun getBlogPosts(
+        forceRefresh: Boolean,
+        onFetchSuccess: () -> Unit,
+        onFetchFailed: (Throwable) -> Unit
+    ): Flow<Resource<List<Blog>>> =
+        networkBoundResource(
+            query = {
+                blogDao.getAllBlogFeed()
+            },
 
+            fetch = {
+                firebaseApi.fetchBlogPosts()
+            },
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun fetchBlogPosts(forceRefresh: Boolean) =  callbackFlow<Resource<List<Blog>>> {
-        val blogPostListener = object : ValueEventListener {
+            saveFetchResult = {
+                serverBlogArticles ->
 
-            override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
-            }
+                val  bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
-            override fun onDataChange(snapshot: DataSnapshot) {
+                val blogPostArticles =
+                    serverBlogArticles.map { serverBlogArticle ->
 
-                val queryList = mutableListOf<Blog>()
-                if (snapshot.exists()) {
-                    for (e in snapshot.children) {
-                        val blog = e.getValue(Blog::class.java)
-                        if (blog != null) {
-                            queryList.add(blog)
+                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
+                            bookmarkedArticle.image == serverBlogArticle.get().image
+
                         }
+
                     }
-                    this@callbackFlow.trySendBlocking(Resource.Success(queryList))
-                }
 
 
             }
-        }
-        blogRef
-            .addValueEventListener(blogPostListener)
 
-        awaitClose {
-            blogRef
-                .removeEventListener(blogPostListener)
-        }
-    }
+
+
+        )
+
+
+
 
     @ExperimentalCoroutinesApi
     fun searchForBlogs(str: String, forceRefresh: Boolean) =  callbackFlow<Resource<MutableList<Blog>>> {
@@ -175,3 +176,4 @@ class BlogRepository @Inject constructor(
     }
 
 }
+

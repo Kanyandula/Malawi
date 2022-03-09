@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/homeFragment"
-        android:title="Home"
+        android:title="@string/home"
         android:icon="@drawable/ic__17_home" />
 
     <item android:id="@+id/searchFragment"
-        android:title="Search"
+        android:title="@string/search"
         android:icon="@drawable/ic__36_zoom" />
 
-    <item
-        android:id="@+id/signInFragment"
-        android:icon="@drawable/ic_add_circle_24"
-        android:title="Post"
-
-
-        />
-
-
     <item android:id="@+id/bookMarkFragment"
-        android:title="BookMark"
+        android:title="@string/bookmark"
         android:icon="@drawable/ic_bookmarks" />
 
 </menu>

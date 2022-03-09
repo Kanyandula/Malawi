@@ -29,4 +29,7 @@
     <string name="rating">Rating</string>
     <string name="description">Mughal Gardens which have truly changed the face of the Mughal Empire is one of the most popular and the most visited tourist attractions of Srinagar.</string>
     <string name="book_mark">book mark</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="bookmark">BookMark</string>
 </resources>
