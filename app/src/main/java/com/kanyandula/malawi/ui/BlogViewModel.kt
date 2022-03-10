@@ -31,8 +31,15 @@ class BlogViewModel @Inject constructor(
 
     val fetchBlogPost = refreshTrigger.flatMapLatest { refresh ->
 
-        repository.fetchBlogPosts(
-            refresh == Refresh.FORCE
+        repository.getBlogPosts(
+            refresh == Refresh.FORCE,
+            onFetchSuccess = {
+                pendingScrollToTopAfterRefresh = true
+            },
+            onFetchFailed = { t ->
+                viewModelScope.launch { eventChannel.send(Event.ShowErrorMessage(t)) }
+            }
+
         )
 
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
@@ -60,7 +67,7 @@ class BlogViewModel @Inject constructor(
 
     fun onBookmarkClick(blog: Blog) {
         val currentlyBookmarked = blog.favorite
-        val updatedArticle = blog.copy(favorite = !currentlyBookmarked!!)
+        val updatedArticle = blog.copy(favorite = !currentlyBookmarked)
         viewModelScope.launch {
             repository.updateBlogs(updatedArticle)
 

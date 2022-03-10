@@ -5,10 +5,13 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.kanyandula.malawi.api.BlogDto
+import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.data.BlogDataBase
 import com.kanyandula.malawi.utils.Resource
@@ -18,7 +21,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
+import java.io.IOException
 import java.lang.Exception
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -26,8 +31,10 @@ import javax.inject.Inject
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
     private  val blogDataBase: BlogDataBase,
-    private  val firebaseApi: FirebaseApi
 ) {
+
+
+
 
     private  val blogDao = blogDataBase.blogDao()
 
@@ -42,31 +49,41 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                firebaseApi.fetchBlogPosts()
+                fetchBlogPosts()
+
             },
 
             saveFetchResult = {
-                serverBlogArticles ->
-                val  bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
-
-                val blogPostArticles =
-                    serverBlogArticles.map { serverBlogArticle ->
-
-                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
-                            bookmarkedArticle.image == serverBlogArticle.image
-                        }
-
-                        Blog(
-                            time = serverBlogArticle.
-                        )
+                    serverBlogNewsArticles ->
 
 
+                 blogDao.getAllBookmarkedBlogs().first()
+
+
+
+            },
+
+            shouldFetch = { cachedArticles ->
+                if (forceRefresh) {
+                    true
+                } else {
+                    val sortedArticles = cachedArticles.sortedBy { article ->
+                        article.timestamp
                     }
-
-
+                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
+                    val needsRefresh = oldestTimestamp == null ||
+                            oldestTimestamp < (System.currentTimeMillis() -
+                            TimeUnit.MINUTES.toMillis(60)).toString()
+                    needsRefresh
+                }
+            },
+            onFetchSuccess = onFetchSuccess,
+            onFetchFailed = { t ->
+                if (t !is HttpException && t !is IOException) {
+                    throw t
+                }
+                onFetchFailed(t)
             }
-
-
 
         )
 
@@ -178,6 +195,77 @@ class BlogRepository @Inject constructor(
     suspend fun deleteNonBookmarkedArticlesOlderThan(timestampInMillis: Long) {
         blogDao.deleteNonBookmarkedArticlesOlderThan(timestampInMillis)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun fetchBlogPosts() :  Flow<Resource<MutableList<Blog>>> =  callbackFlow<Resource<MutableList<Blog>>>  {
+        val blogPostListener = object : ValueEventListener {
+
+            override fun onCancelled(error: DatabaseError) {
+                this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val queryList = mutableListOf<Blog>()
+                if (snapshot.exists()) {
+                    for (e in snapshot.children) {
+                        val blog = e.getValue(Blog::class.java)
+                        if (blog != null) {
+                            queryList.add(blog)
+                        }
+                    }
+                    this@callbackFlow.trySendBlocking(Resource.Success(queryList))
+                }
+
+
+            }
+        }
+        blogRef
+            .addValueEventListener(blogPostListener)
+
+        awaitClose {
+            blogRef
+                .removeEventListener(blogPostListener)
+        }
+    }
+
+
+
+
+
+    suspend fun fetchBlogPost1(): BlogResponse {
+        val response = BlogResponse()
+        try {
+            response.blog = blogRef.get().await().children.map { snapShot ->
+                snapShot.getValue(BlogDto::class.java)!!
+            }
+        } catch (exception: Exception) {
+            response.exception = exception
+        }
+        return response
+    }
+
+
+
+    fun fetchBlogPost() : MutableLiveData<BlogResponse> {
+        val mutableLiveData = MutableLiveData<BlogResponse>()
+        blogRef.get().addOnCompleteListener { task ->
+            val response = BlogResponse()
+            if (task.isSuccessful) {
+                val result = task.result
+                result?.let {
+                    response.blog = result.children.map { snapShot ->
+                        snapShot.getValue(BlogDto::class.java)!!
+                    }
+                }
+            } else {
+                response.exception = task.exception
+            }
+            mutableLiveData.value = response
+        }
+        return mutableLiveData
+    }
+
 
 }
 
