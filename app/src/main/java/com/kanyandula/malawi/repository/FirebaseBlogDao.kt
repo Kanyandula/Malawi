@@ -22,13 +22,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Singleton
 
 
-interface FirebaseApi {
+interface FirebaseBlogDao {
 
-
-         var blogRef: DatabaseReference
-
-
-
-
+    fun fetchBlogPosts(): Flow<Resource<List<Blog>>>
 
 }

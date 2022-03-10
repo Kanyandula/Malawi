@@ -4,16 +4,16 @@ package com.kanyandula.malawi.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.Blog
 import com.kanyandula.malawi.data.BlogDataBase
+import com.kanyandula.malawi.data.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
     private  val blogDataBase: BlogDataBase,
-) {
+): FirebaseBlogDao {
 
 
 
@@ -49,18 +49,41 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                fetchBlogPosts()
+                val response = fetchBlogPost1()
+                response.blog
 
             },
 
             saveFetchResult = {
                     serverBlogNewsArticles ->
+                val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
+                val blogPostArticles =
+                    serverBlogNewsArticles?.map { serverBlogNewsArticle ->
+                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
+                            bookmarkedArticle.image == serverBlogNewsArticle.image
+                        }
 
-                 blogDao.getAllBookmarkedBlogs().first()
+                        Blog(
+                            title = serverBlogNewsArticle.title,
+                            desc = serverBlogNewsArticle.desc,
+                           time = serverBlogNewsArticle.time,
+                            uid = serverBlogNewsArticle.uid,
+                            userName = serverBlogNewsArticle.userName,
+                            timestamp =  serverBlogNewsArticle.timestamp,
 
+                            favorite = isBookmarked
 
-
+                        )
+                    }
+                val blogArticles = blogPostArticles!!.map { blog ->
+                    LatestBlogs(blog.image)
+                }
+                blogDataBase.withTransaction {
+                    blogDao.deleteAllBlogFeed()
+                    blogDao.insertBlogs(blogPostArticles)
+                    blogDao.insertBlogFeed(blogArticles)
+                }
             },
 
             shouldFetch = { cachedArticles ->
@@ -86,6 +109,42 @@ class BlogRepository @Inject constructor(
             }
 
         )
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun fetchBlogPosts() =  callbackFlow<Resource<List<Blog>>> {
+        val blogPostListener = object : ValueEventListener {
+
+            override fun onCancelled(error: DatabaseError) {
+                this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val queryList = mutableListOf<Blog>()
+                if (snapshot.exists()) {
+                    for (e in snapshot.children) {
+                        val blog = e.getValue(Blog::class.java)
+                        if (blog != null) {
+                            queryList.add(blog)
+                        }
+                    }
+                    this@callbackFlow.trySendBlocking(Resource.Success(queryList))
+                }
+
+
+            }
+        }
+        blogRef
+            .addValueEventListener(blogPostListener)
+
+        awaitClose {
+            blogRef
+                .removeEventListener(blogPostListener)
+        }
+    }
+
+
 
 
 
@@ -196,39 +255,6 @@ class BlogRepository @Inject constructor(
         blogDao.deleteNonBookmarkedArticlesOlderThan(timestampInMillis)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun fetchBlogPosts() :  Flow<Resource<MutableList<Blog>>> =  callbackFlow<Resource<MutableList<Blog>>>  {
-        val blogPostListener = object : ValueEventListener {
-
-            override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                val queryList = mutableListOf<Blog>()
-                if (snapshot.exists()) {
-                    for (e in snapshot.children) {
-                        val blog = e.getValue(Blog::class.java)
-                        if (blog != null) {
-                            queryList.add(blog)
-                        }
-                    }
-                    this@callbackFlow.trySendBlocking(Resource.Success(queryList))
-                }
-
-
-            }
-        }
-        blogRef
-            .addValueEventListener(blogPostListener)
-
-        awaitClose {
-            blogRef
-                .removeEventListener(blogPostListener)
-        }
-    }
-
 
 
 
@@ -265,6 +291,7 @@ class BlogRepository @Inject constructor(
         }
         return mutableLiveData
     }
+
 
 
 }

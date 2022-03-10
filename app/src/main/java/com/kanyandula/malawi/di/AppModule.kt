@@ -9,7 +9,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.kanyandula.malawi.data.BlogDataBase
-import com.kanyandula.malawi.repository.FirebaseApi
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.Module
 import dagger.Provides

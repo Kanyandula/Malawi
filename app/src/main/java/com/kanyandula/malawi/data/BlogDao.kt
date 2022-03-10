@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BlogDao {
 
-        @Query("SELECT * FROM   blog_articles")
+        @Query("SELECT * FROM  blog_articles   ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
@@ -17,7 +17,7 @@ interface BlogDao {
         suspend fun insertBlogs(articles: List<Blog>)
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        suspend fun insertBlogFeed(blogFeed: List<BlogFeed>)
+        suspend fun insertBlogFeed(blogFeed: List<LatestBlogs>)
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         suspend fun upsert(blog: Blog): Long

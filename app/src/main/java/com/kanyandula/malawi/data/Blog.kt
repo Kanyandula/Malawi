@@ -9,7 +9,7 @@ import java.io.Serializable
 
 @Entity(tableName = "blog_articles")
 data class Blog(
-    val date: String? = null ,
+    var date: String? = null ,
     val title: String? = null,
     val desc: String? = null,
     @PrimaryKey  @NonNull val image: String = "",
@@ -21,6 +21,12 @@ data class Blog(
     ): Serializable{
 
 }
+@Entity(tableName = "latest_blog")
+data class LatestBlogs(
+    val userName: String? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0
+
+)
 
 
 @Entity(tableName = "blog_feed", primaryKeys = ["searchQuery", "title"]  )
