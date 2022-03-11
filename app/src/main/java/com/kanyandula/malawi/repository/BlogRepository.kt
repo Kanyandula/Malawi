@@ -4,6 +4,9 @@ package com.kanyandula.malawi.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
@@ -111,6 +114,9 @@ class BlogRepository @Inject constructor(
         )
 
 
+
+
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun fetchBlogPosts() =  callbackFlow<Resource<List<Blog>>> {
         val blogPostListener = object : ValueEventListener {
@@ -215,7 +221,7 @@ class BlogRepository @Inject constructor(
     return response
     } **/
 
-    suspend   fun searchForBlogs(str: String, liveData: MutableLiveData<List<Blog>>) {
+      fun searchForBlogs(str: String, liveData: MutableLiveData<List<Blog>>) {
 
         blogRef.orderByChild("title")
             .startAt(str).

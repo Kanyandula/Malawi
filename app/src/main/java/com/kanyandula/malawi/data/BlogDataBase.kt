@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Blog::class, BlogFeed::class, LatestBlogs::class, SearchQueryRemoteKey::class],
+    entities = [Blog::class, SearchResult::class, LatestBlogs::class, SearchQueryRemoteKey::class],
     version = 1
 )
 

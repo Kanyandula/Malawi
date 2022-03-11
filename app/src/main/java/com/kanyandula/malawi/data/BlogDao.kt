@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BlogDao {
 
-        @Query("SELECT * FROM  blog_articles   ")
+
+
+        @Query("SELECT * FROM  blog_articles ")
         fun getAllBlogFeed(): Flow<List<Blog>>
+
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
         fun getAllBookmarkedBlogs(): Flow<List<Blog>>
@@ -31,7 +34,7 @@ interface BlogDao {
         @Query("UPDATE blog_articles SET favorite = 0")
         suspend fun resetAllBookmarks()
 
-        @Query("DELETE FROM  blog_feed")
+        @Query("DELETE FROM  search_results")
         suspend fun deleteAllBlogFeed()
 
         @Query("DELETE FROM blog_articles WHERE timestamp < :timestampInMillis AND favorite = 0")

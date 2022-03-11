@@ -23,14 +23,14 @@ data class Blog(
 }
 @Entity(tableName = "latest_blog")
 data class LatestBlogs(
-    val userName: String? = null,
+    val image: String? = null,
     @PrimaryKey(autoGenerate = true) val id: Int = 0
 
 )
 
 
-@Entity(tableName = "blog_feed", primaryKeys = ["searchQuery", "title"]  )
-data class BlogFeed(
+@Entity(tableName = "search_results", primaryKeys = ["searchQuery", "title"]  )
+data class SearchResult(
     val searchQuery: String,
     val title: String,
     val queryPosition: Int

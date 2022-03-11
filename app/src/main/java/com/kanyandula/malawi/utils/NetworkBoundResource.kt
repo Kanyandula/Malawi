@@ -22,7 +22,7 @@ inline fun <ResultType, RequestType> networkBoundResource(
         }
 
         try {
-            saveFetchResult(fetch())
+            //saveFetchResult(fetch())
             onFetchSuccess()
             loading.cancel()
             query().collect { send(Resource.Success(it)) }
