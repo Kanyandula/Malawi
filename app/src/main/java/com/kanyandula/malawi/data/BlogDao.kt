@@ -12,6 +12,8 @@ interface BlogDao {
         @Query("SELECT * FROM  blog_articles ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
+      
+
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
         fun getAllBookmarkedBlogs(): Flow<List<Blog>>

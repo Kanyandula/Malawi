@@ -53,14 +53,15 @@
             android:padding="10dp"
             android:id="@+id/container1"
             >
+
             <TextView
+                android:id="@+id/blog_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/blog_title"
                 android:text="@string/title"
                 android:textColor="#000"
                 android:textSize="19sp"
-                />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"

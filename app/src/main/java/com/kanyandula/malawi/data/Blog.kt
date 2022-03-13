@@ -24,6 +24,7 @@ data class Blog(
 @Entity(tableName = "latest_blog")
 data class LatestBlogs(
     val image: String? = null,
+    val favorite: Boolean = false,
     @PrimaryKey(autoGenerate = true) val id: Int = 0
 
 )
