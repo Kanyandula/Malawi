@@ -47,7 +47,7 @@
         tools:layout="@layout/fragment_blog_detail">
         <argument
             android:name="blogs"
-            app:argType="com.kanyandula.malawi.data.Blog" />
+            app:argType="com.kanyandula.malawi.data.model.Blog" />
 
     </fragment>
 

@@ -2,7 +2,7 @@
 //
 //import com.google.firebase.database.DatabaseReference
 //import com.google.firebase.database.FirebaseDatabase
-//import com.kanyandula.malawi.data.Blog
+//import com.kanyandula.malawi.data.model.Blog
 //import com.kanyandula.malawi.utils.Constants
 //import kotlinx.coroutines.tasks.await
 //import java.lang.Exception

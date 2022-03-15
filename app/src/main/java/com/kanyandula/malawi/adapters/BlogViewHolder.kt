@@ -3,9 +3,8 @@ package com.kanyandula.malawi.adapters
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kanyandula.malawi.R
-import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.databinding.BlogListItemBinding
-import java.lang.ref.WeakReference
 
 class BlogViewHolder(
     private val binding: BlogListItemBinding,

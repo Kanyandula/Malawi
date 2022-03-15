@@ -4,19 +4,16 @@ package com.kanyandula.malawi.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.kanyandula.malawi.api.BlogDto
+import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
-import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.data.BlogDataBase
-import com.kanyandula.malawi.data.LatestBlogs
+import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +31,8 @@ import javax.inject.Inject
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
     private  val blogDataBase: BlogDataBase,
+    private val entityMapper: BlogEntityMapper,
+    private val blogDtoMapper: BlogDtoMapper
 ): FirebaseBlogDao {
 
 
@@ -58,34 +57,13 @@ class BlogRepository @Inject constructor(
             },
 
             saveFetchResult = {
-                    serverBlogNewsArticles ->
-                val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
+                val result = fetchBlogPost1()
+                result.blog
 
-                val blogPostArticles =
-                    serverBlogNewsArticles?.map { serverBlogNewsArticle ->
-                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
-                            bookmarkedArticle.image == serverBlogNewsArticle.image
-                        }
-
-                        Blog(
-                            title = serverBlogNewsArticle.title,
-                            desc = serverBlogNewsArticle.desc,
-                           time = serverBlogNewsArticle.time,
-                            uid = serverBlogNewsArticle.uid,
-                            userName = serverBlogNewsArticle.userName,
-                            timestamp =  serverBlogNewsArticle.timestamp,
-
-                            favorite = isBookmarked
-
-                        )
-                    }
-                val blogArticles = blogPostArticles!!.map { blog ->
-                    LatestBlogs(blog.image)
-                }
-                blogDataBase.withTransaction {
-                    blogDao.deleteAllBlogFeed()
-                    blogDao.insertBlogs(blogPostArticles)
-                    blogDao.insertBlogFeed(blogArticles)
+                result.blog?.let { it1 -> entityMapper.mapFromDomainModel(it1) }?.let { it2 ->
+                    blogDao.insertBlogs(
+                        it2
+                    )
                 }
             },
 
@@ -297,6 +275,8 @@ class BlogRepository @Inject constructor(
         }
         return mutableLiveData
     }
+
+
 
 
 

@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.databinding.FragmentBlogDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_blog_detail.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 

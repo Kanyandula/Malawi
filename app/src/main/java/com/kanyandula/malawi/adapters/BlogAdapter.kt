@@ -4,7 +4,7 @@ package com.kanyandula.malawi.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.databinding.BlogListItemBinding
 
 class BlogAdapter(

@@ -2,6 +2,8 @@ package com.kanyandula.malawi.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.kanyandula.malawi.data.model.Blog
+import com.kanyandula.malawi.data.model.LatestBlogs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -12,14 +14,14 @@ interface BlogDao {
         @Query("SELECT * FROM  blog_articles ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
-      
-
+        @Insert
+        suspend fun insertBlog(blog: Blog): Long
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
         fun getAllBookmarkedBlogs(): Flow<List<Blog>>
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        suspend fun insertBlogs(articles: List<Blog>)
+        suspend fun insertBlogs(articles: Blog)
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         suspend fun insertBlogFeed(blogFeed: List<LatestBlogs>)

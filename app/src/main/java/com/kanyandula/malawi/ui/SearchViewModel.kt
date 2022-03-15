@@ -1,7 +1,7 @@
 package com.kanyandula.malawi.ui
 
 import androidx.lifecycle.*
-import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.repository.BlogRepository
 import com.kanyandula.malawi.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

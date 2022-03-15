@@ -1,4 +1,4 @@
-package com.kanyandula.malawi.data
+package com.kanyandula.malawi.data.model
 
 
 import androidx.annotation.NonNull
@@ -9,10 +9,12 @@ import java.io.Serializable
 
 @Entity(tableName = "blog_articles")
 data class Blog(
-    var date: String? = null ,
+    var date: String? = null,
     val title: String? = null,
     val desc: String? = null,
-    @PrimaryKey  @NonNull val image: String = "",
+    @PrimaryKey
+    @NonNull
+    val image: String = "",
     val time: String? = null,
     val uid: String? = null,
     val userName: String? = null,

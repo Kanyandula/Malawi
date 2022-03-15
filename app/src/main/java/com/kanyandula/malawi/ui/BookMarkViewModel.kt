@@ -2,7 +2,7 @@ package com.kanyandula.malawi.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kanyandula.malawi.data.Blog
+import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.repository.BlogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted

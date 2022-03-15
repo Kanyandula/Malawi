@@ -1,7 +1,5 @@
 package com.kanyandula.malawi.api
 
-import com.kanyandula.malawi.data.Blog
-
 
 data class BlogResponse(
     var blog:List< BlogDto>? = null,
