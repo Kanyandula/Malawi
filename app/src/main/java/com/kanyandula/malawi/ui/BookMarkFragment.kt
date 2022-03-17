@@ -14,9 +14,10 @@ import com.kanyandula.malawi.adapters.BlogAdapter
 import com.kanyandula.malawi.databinding.FragmentBookMarkBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
+class BookMarkFragment : Fragment(R.layout.fragment_book_mark), BlogAdapter.NewsFeedItemInterface {
 
     private val viewModel: BookMarkViewModel by viewModels()
 
@@ -28,7 +29,11 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
 
         currentBinding = FragmentBookMarkBinding.bind(view)
 
+
         val blogAdapter = BlogAdapter(
+
+
+
             onItemClick = {
                 viewModel.addToRecentlyViedBlogs(it)
                 val bundle = Bundle().apply {
@@ -40,9 +45,12 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
                 )
             },
 
-            onBookmarkClick = { blog ->
+            onBookmarkClick  = { blog ->
+
                 viewModel.onBookMarkClick(blog)
-            }
+            },
+
+            callbackWeakRef = WeakReference(this)
         )
 
         blogAdapter.stateRestorationPolicy =
@@ -76,6 +84,11 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
     override fun onDestroyView() {
         super.onDestroyView()
         currentBinding = null
+    }
+
+
+    override fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean) {
+        viewModel.updateFavoriteStatus(newsFeedItemId, newStatus)
     }
 }
 

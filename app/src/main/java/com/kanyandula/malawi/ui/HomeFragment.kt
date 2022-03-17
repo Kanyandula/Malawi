@@ -20,10 +20,11 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import java.lang.ref.WeakReference
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemInterface {
 
     private val  viewModel: BlogViewModel by viewModels()
     private var currentBinding: FragmentHomeBinding? = null
@@ -47,7 +48,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             onBookmarkClick = { blog ->
                 viewModel.onBookmarkClick(blog)
 
-            }
+            },
+
+            callbackWeakRef = WeakReference(this)
+
 
         )
 
@@ -129,5 +133,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onDestroyView() {
         super.onDestroyView()
         currentBinding = null
+    }
+
+    override fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean) {
+        viewModel.updateFavoriteStatus(newsFeedItemId, newStatus)
     }
 }

@@ -14,7 +14,8 @@ class BlogDtoMapper : DomainMapper<BlogDto, Blog> {
            uid = model.uid,
            userName = model.userName,
            timestamp = model.timestamp,
-           favorite = model.favorite
+           favorite = model.favorite,
+
        )
     }
 
@@ -22,16 +23,18 @@ class BlogDtoMapper : DomainMapper<BlogDto, Blog> {
     /**
      * We use this function when publishing to the network
      */
-    override fun mapFromDomainModel(domainModel: List<Blog>): BlogDto {
+
+
+    override fun mapFromDomainModel(domainModel: Blog): BlogDto {
         return BlogDto(
-            title = domainModel[0].title,
-            date =  domainModel[1].date,
-            desc = domainModel[2].desc,
-            image = domainModel[3].image,
-            uid = domainModel[4].uid,
-            userName = domainModel[5].userName,
-            timestamp = domainModel[6].timestamp,
-            favorite = domainModel[7].favorite
+            title = domainModel.title,
+            date =  domainModel.date,
+            desc = domainModel.desc,
+            image = domainModel.image,
+            uid = domainModel.uid,
+            userName = domainModel.userName,
+            timestamp = domainModel.timestamp,
+            favorite = domainModel.favorite,
         )
     }
 

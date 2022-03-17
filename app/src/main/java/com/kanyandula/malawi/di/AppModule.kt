@@ -36,8 +36,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFirebaseReference(): DatabaseReference{
-       // return  FirebaseDatabase.getInstance().reference.child(BLOG_REF)
-        return FirebaseDatabase.getInstance().getReference(BLOG_REF)
+        return  FirebaseDatabase.getInstance().reference.child(BLOG_REF)
+        //return FirebaseDatabase.getInstance().getReference(BLOG_REF)
     }
 
 

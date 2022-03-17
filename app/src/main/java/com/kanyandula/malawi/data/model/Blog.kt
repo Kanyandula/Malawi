@@ -9,6 +9,7 @@ import java.io.Serializable
 
 @Entity(tableName = "blog_articles")
 data class Blog(
+
     var date: String? = null,
     val title: String? = null,
     val desc: String? = null,
@@ -19,7 +20,8 @@ data class Blog(
     val uid: String? = null,
     val userName: String? = null,
     val timestamp: String? = null,
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+
     ): Serializable{
 
 }

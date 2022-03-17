@@ -27,12 +27,14 @@ class BlogViewHolder(
                     blog.favorite
                     -> R.drawable.ic_bookmark_selected
                     else -> R.drawable.ic_bookmark_unselected
+
                 }
             )
         }
     }
 
     init {
+
         binding.apply {
             root.setOnClickListener {
                 val position = bindingAdapterPosition
@@ -41,10 +43,19 @@ class BlogViewHolder(
                 }
             }
             imageViewBookmark.setOnClickListener {
+
                 val position = bindingAdapterPosition
+
                 if (position != RecyclerView.NO_POSITION) {
                     onBookmarkClick(position)
+
+
             }
+
+
+
+
+
         }
     }
 }

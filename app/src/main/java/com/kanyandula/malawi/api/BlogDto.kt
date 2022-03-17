@@ -5,6 +5,7 @@ package com.kanyandula.malawi.api
 
 
 data class BlogDto (
+
     val date: String? = null,
     val title: String? = null,
     val desc: String? = null,
@@ -14,5 +15,6 @@ data class BlogDto (
     val uid: String? = null,
     val userName: String? = null,
     val timestamp: String? = null,
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+
         )

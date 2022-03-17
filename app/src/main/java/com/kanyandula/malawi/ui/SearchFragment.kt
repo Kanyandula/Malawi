@@ -30,10 +30,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import java.lang.ref.WeakReference
+
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class SearchFragment : Fragment(R.layout.fragment_search) {
+class SearchFragment : Fragment(R.layout.fragment_search),  BlogAdapter.NewsFeedItemInterface {
 
 
     private val  viewModel: SearchViewModel by viewModels()
@@ -63,7 +65,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             },
             onBookmarkClick = { blog ->
                 viewModel.onBookMarkClick(blog)
-            }
+            },
+
+            callbackWeakRef = WeakReference(this)
 
         )
 
@@ -150,5 +154,10 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         binding.resultList.adapter = null
         currentBinding = null
     }
+
+    override fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean) {
+        viewModel.updateFavoriteStatus(newsFeedItemId, newStatus)
+    }
+
 
 }
