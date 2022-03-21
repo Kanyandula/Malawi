@@ -51,29 +51,35 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                fetchBlogPost1()
+                fetchBlogPost()
 
             },
 
             saveFetchResult = {
-                fetchBlogPost1()
+                val networkBlog = fetchBlogPost().blog
+
+                networkBlog?.forEach {
+                    e -> blogDao.insertBlog(e)
+                }
+
+
 
             },
 
-//            shouldFetch = { cachedArticles ->
-//                if (forceRefresh) {
-//                    true
-//                } else {
-//                    val sortedArticles = cachedArticles.sortedBy { article ->
-//                        article.timestamp
-//                    }
-//                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
-//                    val needsRefresh = oldestTimestamp == null ||
-//                            oldestTimestamp < (System.currentTimeMillis() -
-//                            TimeUnit.MINUTES.toMillis(60)).toString()
-//                    needsRefresh
-//                }
-//            },
+            shouldFetch = { cachedArticles ->
+                if (forceRefresh) {
+                    true
+                } else {
+                    val sortedArticles = cachedArticles.sortedBy { article ->
+                        article.timestamp
+                    }
+                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
+                    val needsRefresh = oldestTimestamp == null ||
+                            oldestTimestamp < (System.currentTimeMillis() -
+                            TimeUnit.MINUTES.toMillis(60)).toString()
+                    needsRefresh
+                }
+            },
             onFetchSuccess = onFetchSuccess,
             onFetchFailed = { t ->
                 if (t !is HttpException && t !is IOException) {
@@ -188,14 +194,8 @@ class BlogRepository @Inject constructor(
         val response = BlogResponse()
         try {
             response.blog = blogRef.get().await().children.map { snapShot ->
-                Log.i("SNAPSHOT",  snapShot.value.toString())
-
-                snapShot.getValue(BlogDto::class.java)!!
-
+                snapShot.getValue(Blog::class.java)!!
             }
-            Log.i("ITEMS", response.blog.toString() )
-
-
         } catch (exception: Exception) {
             response.exception = exception
         }
@@ -204,15 +204,15 @@ class BlogRepository @Inject constructor(
 
 
 
-    fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
+    private fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
         val mutableLiveData = MutableLiveData<BlogResponse>()
-        blogRef.orderByChild("counter").get().addOnCompleteListener { task ->
+        blogRef.get().addOnCompleteListener { task ->
             val response = BlogResponse()
             if (task.isSuccessful) {
                 val result = task.result
                 result?.let {
                     response.blog = result.children.map { snapShot ->
-                        snapShot.getValue(BlogDto::class.java)!!
+                        snapShot.getValue(Blog::class.java)!!
                     }
                 }
             } else {
@@ -222,8 +222,6 @@ class BlogRepository @Inject constructor(
         }
         return mutableLiveData
     }
-
-
 
 
 

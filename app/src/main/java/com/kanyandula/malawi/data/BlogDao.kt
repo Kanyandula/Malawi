@@ -14,6 +14,9 @@ interface BlogDao {
         @Query("SELECT * FROM  blog_articles ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
+        @Query("SELECT * FROM  blog_articles ")
+        fun getAllBlogPost(): Blog
+
         @Insert
         suspend fun insertBlog(blog: Blog): Long
 
