@@ -26,21 +26,25 @@ class BlogEntityMapper : DomainMapper<Blog, BlogDto> {
 
 
     override fun mapFromDomainModel(domainModel: BlogDto): Blog {
-        return Blog(
-            title = domainModel.title,
-            date =  domainModel.date,
-            desc = domainModel.desc,
-            image = domainModel.image,
-            uid = domainModel.uid,
-            userName = domainModel.userName,
-            timestamp = domainModel.timestamp,
-            favorite = domainModel.favorite,
-        )
-    }
+
+            return Blog(
+                title = domainModel.title,
+                date = domainModel.date,
+                desc = domainModel.desc,
+                image = domainModel.image,
+                uid = domainModel.uid,
+                userName = domainModel.userName,
+                timestamp = domainModel.timestamp,
+                favorite = domainModel.favorite,
+            )
+        }
+
 
     fun fromEntityList(initial: List<Blog>): List<BlogDto>{
         return initial.map { mapToDomainModel(it) }
     }
+
+
 
 //    fun  toEntityList(initial: List<BlogDto>): List<Blog>{
 //        return initial.map { mapFromDomainModel(it) }

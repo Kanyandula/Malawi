@@ -51,38 +51,29 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                val response = fetchBlogPost()
-                response.blog
+                fetchBlogPost1()
 
             },
 
             saveFetchResult = {
-
-
-
-
-                    blogDao.insertBlogs(
-                       entityMapper.mapFromDomainModel(it
-
-                       )
-                    )
+                fetchBlogPost1()
 
             },
 
-            shouldFetch = { cachedArticles ->
-                if (forceRefresh) {
-                    true
-                } else {
-                    val sortedArticles = cachedArticles.sortedBy { article ->
-                        article.timestamp
-                    }
-                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
-                    val needsRefresh = oldestTimestamp == null ||
-                            oldestTimestamp < (System.currentTimeMillis() -
-                            TimeUnit.MINUTES.toMillis(60)).toString()
-                    needsRefresh
-                }
-            },
+//            shouldFetch = { cachedArticles ->
+//                if (forceRefresh) {
+//                    true
+//                } else {
+//                    val sortedArticles = cachedArticles.sortedBy { article ->
+//                        article.timestamp
+//                    }
+//                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
+//                    val needsRefresh = oldestTimestamp == null ||
+//                            oldestTimestamp < (System.currentTimeMillis() -
+//                            TimeUnit.MINUTES.toMillis(60)).toString()
+//                    needsRefresh
+//                }
+//            },
             onFetchSuccess = onFetchSuccess,
             onFetchFailed = { t ->
                 if (t !is HttpException && t !is IOException) {
@@ -215,7 +206,7 @@ class BlogRepository @Inject constructor(
 
     fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
         val mutableLiveData = MutableLiveData<BlogResponse>()
-        blogRef.get().addOnCompleteListener { task ->
+        blogRef.orderByChild("counter").get().addOnCompleteListener { task ->
             val response = BlogResponse()
             if (task.isSuccessful) {
                 val result = task.result
