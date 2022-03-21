@@ -1,6 +1,7 @@
 package com.kanyandula.malawi.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.core.view.isVisible
@@ -34,7 +35,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemI
         super.onViewCreated(view, savedInstanceState)
         currentBinding = FragmentHomeBinding.bind(view)
 
-        var blogAdapter = BlogAdapter(
+        val blogAdapter = BlogAdapter(
             onItemClick = {
                 viewModel.addToRecentlyViedBlogs(it)
                 val bundle = Bundle().apply {
@@ -82,6 +83,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemI
                     result.error?.localizedMessage
                         ?: getString(R.string.unknown_error_occurred)
                 )
+
+                Log.d("TAG", "${result.data}")
+                println("${result.data}")
 
                 blogAdapter.submitList(result.data) {
                     if (viewModel.pendingScrollToTopAfterRefresh) {

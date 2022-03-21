@@ -59,7 +59,9 @@ class BlogRepository @Inject constructor(
                 val networkBlog = fetchBlogPost().blog
 
                 networkBlog?.forEach {
-                    e -> blogDao.insertBlog(e)
+                        e ->
+                    blogDao.insertBlog(e)
+
                 }
 
 
