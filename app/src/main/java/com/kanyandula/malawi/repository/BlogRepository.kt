@@ -4,6 +4,7 @@ package com.kanyandula.malawi.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -14,6 +15,7 @@ import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.data.BlogDataBase
 import com.kanyandula.malawi.data.model.BlogEntityMapper
+import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,15 +32,13 @@ import javax.inject.Inject
 
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
-    blogDataBase: BlogDataBase,
+    private var   blogDataBase: BlogDataBase,
     private val entityMapper: BlogEntityMapper,
     private val blogDtoMapper: BlogDtoMapper
 ){
 
-
-
-
     private  val blogDao = blogDataBase.blogDao()
+
 
     fun getBlogPosts(
         forceRefresh: Boolean,
@@ -51,19 +51,47 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                fetchBlogPost()
-
+                val response  =    fetchBlogPost()
+                response.blog
             },
 
             saveFetchResult = {
-                val networkBlog = fetchBlogPost().blog
+                    serverBlogNewsArticles ->
 
-                networkBlog?.forEach {
-                        e ->
-                    blogDao.insertBlog(e)
+                val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
+
+                val homeBlogsArticles =
+                    serverBlogNewsArticles?.map {  serverBlogNewsArticle ->
+                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
+                            bookmarkedArticle.image == serverBlogNewsArticle.image
+                        }
+
+                        Blog(
+                            title = serverBlogNewsArticle.title,
+                            date = serverBlogNewsArticle.date,
+                            desc = serverBlogNewsArticle.desc,
+                            image = serverBlogNewsArticle.image,
+                            uid = serverBlogNewsArticle.uid,
+                            userName = serverBlogNewsArticle.userName,
+                            timestamp = serverBlogNewsArticle.timestamp,
+                            favorite = isBookmarked
+                        )
+
+                    }
+
+                val homeBlogs =  homeBlogsArticles?.map { article ->
+                    LatestBlogs(article.image)
 
                 }
 
+                blogDataBase.withTransaction {
+
+                    if (homeBlogsArticles != null) {
+                        blogDao.insertBlogFeed(homeBlogsArticles)
+                    }
+
+
+                }
 
 
             },

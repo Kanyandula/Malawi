@@ -9,12 +9,15 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.kanyandula.malawi.api.BlogDtoMapper
+import com.kanyandula.malawi.data.BlogDao
 import com.kanyandula.malawi.data.BlogDataBase
 import com.kanyandula.malawi.data.model.BlogEntityMapper
+import com.kanyandula.malawi.repository.GetBlogPost
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -60,6 +63,23 @@ object AppModule {
     @Provides
     fun provideMovieMapper(): BlogDtoMapper {
         return BlogDtoMapper()
+    }
+
+
+    @ViewModelScoped
+    @Provides
+    fun  provideGetBlogPost(
+        blogRef: DatabaseReference,
+        blogDao: BlogDao,
+        entityMapper: BlogEntityMapper
+    ):GetBlogPost{
+        return  GetBlogPost(
+            blogRef = blogRef,
+            blogDao = blogDao,
+            entityMapper = entityMapper,
+
+        )
+
     }
 
 }

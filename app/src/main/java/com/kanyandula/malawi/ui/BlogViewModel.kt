@@ -4,6 +4,7 @@ package com.kanyandula.malawi.ui
 import androidx.lifecycle.*
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.repository.BlogRepository
+import com.kanyandula.malawi.utils.ConnectivityManager
 import com.kanyandula.malawi.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class BlogViewModel @Inject constructor(
-    private val repository: BlogRepository
+    private val repository: BlogRepository,
+    private val connectivityManager: ConnectivityManager,
     ) : ViewModel() {
 
     private val eventChannel = Channel<Event>()
@@ -41,6 +43,8 @@ class BlogViewModel @Inject constructor(
             }
 
         )
+
+
 
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 

@@ -15,7 +15,7 @@ data class Blog(
     val desc: String? = null,
     @PrimaryKey
     @NonNull
-    val image: String = "",
+    var image: String = "",
     val time: String? = null,
     val uid: String? = null,
     val userName: String? = null,

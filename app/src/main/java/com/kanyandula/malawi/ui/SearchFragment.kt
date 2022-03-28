@@ -107,6 +107,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),  BlogAdapter.NewsFeed
                                 )
                             )
 
+                        else -> {}
                     }.exhaustive
 
                 }
@@ -142,6 +143,7 @@ class SearchFragment : Fragment(R.layout.fragment_search),  BlogAdapter.NewsFeed
             viewModel.onSearchQuerySubmit(searchText)
             searchView.clearFocus()
         }
+
 
 
     }

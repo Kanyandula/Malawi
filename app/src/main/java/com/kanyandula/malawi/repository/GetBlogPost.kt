@@ -21,7 +21,7 @@ class GetBlogPost(
     private var blogRef: DatabaseReference,
     private val blogDao: BlogDao,
     private val entityMapper: BlogEntityMapper,
-    private val blogDtoMapper: BlogDtoMapper
+    //private val blogDtoMapper: BlogDtoMapper
 ) {
 
     fun execute(
@@ -40,10 +40,10 @@ class GetBlogPost(
 
                     val networkBlog = fetchBlogPost()
 
-                    val it   = networkBlog.blog?.listIterator()
-                    while (it?.hasNext() == true){
-
-                        val e = it.next()
+                    //insert into cache
+                    networkBlog.blog?.forEach {
+                            e ->
+                        blogDao.insertBlog(e)
 
                     }
 

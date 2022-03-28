@@ -6,6 +6,7 @@ import com.kanyandula.malawi.repository.BlogRepository
 import com.kanyandula.malawi.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,6 +27,11 @@ class SearchViewModel @Inject constructor(
 
     private  val currentQuery = state.getLiveData<String?>("currentQuery", null)
     val hasCurrentQuery = currentQuery.asFlow().map { it != null }
+
+    val query = MutableLiveData<String>()
+
+
+
 
 
     @ExperimentalCoroutinesApi
@@ -54,7 +60,7 @@ class SearchViewModel @Inject constructor(
 
     fun  onBookMarkClick (blog: Blog){
         val currentBookmarked = blog.favorite
-        val updateBlog = blog.copy( favorite = !currentBookmarked!!)
+        val updateBlog = blog.copy( favorite = !currentBookmarked)
         viewModelScope.launch {
             repository.updateBlogs(updateBlog)
         }
