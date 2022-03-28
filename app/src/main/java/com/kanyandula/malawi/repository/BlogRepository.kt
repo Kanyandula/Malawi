@@ -1,6 +1,7 @@
 package com.kanyandula.malawi.repository
 
 
+import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +10,6 @@ import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
@@ -31,6 +31,7 @@ import javax.inject.Inject
 
 
 class BlogRepository @Inject constructor(
+    private  val blogApi: BlogApi,
     private var blogRef: DatabaseReference,
     private var   blogDataBase: BlogDataBase,
     private val entityMapper: BlogEntityMapper,
@@ -51,8 +52,13 @@ class BlogRepository @Inject constructor(
             },
 
             fetch = {
-                val response  =    fetchBlogPost()
-                response.blog
+
+
+                val response  =  blogApi.getBreakingNews()
+                response.Blog
+
+//                    fetchBlogPost()
+//                response.blog
             },
 
             saveFetchResult = {
@@ -61,7 +67,7 @@ class BlogRepository @Inject constructor(
                 val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
                 val homeBlogsArticles =
-                    serverBlogNewsArticles?.map {  serverBlogNewsArticle ->
+                    serverBlogNewsArticles?.map { serverBlogNewsArticle ->
                         val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
                             bookmarkedArticle.image == serverBlogNewsArticle.image
                         }
@@ -220,38 +226,38 @@ class BlogRepository @Inject constructor(
 
 
 
-    private suspend fun fetchBlogPost(): BlogResponse {
-        val response = BlogResponse()
-        try {
-            response.blog = blogRef.get().await().children.map { snapShot ->
-                snapShot.getValue(Blog::class.java)!!
-            }
-        } catch (exception: Exception) {
-            response.exception = exception
-        }
-        return response
-    }
+//    private suspend fun fetchBlogPost(): BlogResponse {
+//        val response = BlogResponse()
+//        try {
+//            response.Blog = blogRef.get().await().children.map { snapShot ->
+//                snapShot.getValue(Blog::class.java)!!
+//            }
+//        } catch (exception: Exception) {
+//            response.exception = exception
+//        }
+//        return response
+//    }
 
 
 
-    private fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
-        val mutableLiveData = MutableLiveData<BlogResponse>()
-        blogRef.get().addOnCompleteListener { task ->
-            val response = BlogResponse()
-            if (task.isSuccessful) {
-                val result = task.result
-                result?.let {
-                    response.blog = result.children.map { snapShot ->
-                        snapShot.getValue(Blog::class.java)!!
-                    }
-                }
-            } else {
-                response.exception = task.exception
-            }
-            mutableLiveData.value = response
-        }
-        return mutableLiveData
-    }
+//    private fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
+//        val mutableLiveData = MutableLiveData<BlogResponse>()
+//        blogRef.get().addOnCompleteListener { task ->
+//            val response = BlogResponse()
+//            if (task.isSuccessful) {
+//                val result = task.result
+//                result?.let {
+//                    response.Blog = result.children.map { snapShot ->
+//                        snapShot.getValue(Blog::class.java)!!
+//                    }
+//                }
+//            } else {
+//                response.exception = task.exception
+//            }
+//            mutableLiveData.value = response
+//        }
+//        return mutableLiveData
+//    }
 
 
 

@@ -4,7 +4,7 @@ import com.kanyandula.malawi.data.model.Blog
 
 
 data class BlogResponse(
-    var blog:List<Blog>? = null,
+    var Blog:List<Blog>,
     var exception: Exception? = null,
     val totalResults: Int = 5000
 )

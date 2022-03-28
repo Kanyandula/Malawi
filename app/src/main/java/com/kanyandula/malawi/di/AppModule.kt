@@ -1,6 +1,7 @@
 package com.kanyandula.malawi.di
 
 
+import com.kanyandula.malawi.api.BlogApi
 import android.app.Application
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
@@ -12,13 +13,19 @@ import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.data.BlogDao
 import com.kanyandula.malawi.data.BlogDataBase
 import com.kanyandula.malawi.data.model.BlogEntityMapper
-import com.kanyandula.malawi.repository.GetBlogPost
+
+import com.kanyandula.malawi.utils.Constants.BASE_URL
 import com.kanyandula.malawi.utils.Constants.BLOG_REF
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 
@@ -66,20 +73,52 @@ object AppModule {
     }
 
 
-    @ViewModelScoped
+//    @ViewModelScoped
+//    @Provides
+//    fun  provideGetBlogPost(
+//        blogRef: DatabaseReference,
+//        blogDao: BlogDao,
+//        entityMapper: BlogEntityMapper
+//    ):GetBlogPost{
+//        return  GetBlogPost(
+//            blogRef = blogRef,
+//            blogDao = blogDao,
+//            entityMapper = entityMapper,
+//
+//        )
+//
+//    }
+
+
     @Provides
-    fun  provideGetBlogPost(
-        blogRef: DatabaseReference,
-        blogDao: BlogDao,
-        entityMapper: BlogEntityMapper
-    ):GetBlogPost{
-        return  GetBlogPost(
-            blogRef = blogRef,
-            blogDao = blogDao,
-            entityMapper = entityMapper,
+    @Singleton
+    fun provideRetrofit(): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-        )
-
+    @Provides
+    fun providesLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
     }
+
+    @Singleton
+    @Provides
+    fun providesOkhttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+       ) =
+        OkHttpClient.Builder()
+            .addInterceptor(httpLoggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideNewsApi(retrofit: Retrofit): BlogApi =
+        retrofit.create(BlogApi::class.java)
+
 
 }
