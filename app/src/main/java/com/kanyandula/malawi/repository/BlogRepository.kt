@@ -67,7 +67,7 @@ class BlogRepository @Inject constructor(
                 val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
                 val homeBlogsArticles =
-                    serverBlogNewsArticles?.map { serverBlogNewsArticle ->
+                    serverBlogNewsArticles.map { serverBlogNewsArticle ->
                         val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
                             bookmarkedArticle.image == serverBlogNewsArticle.image
                         }
@@ -85,16 +85,15 @@ class BlogRepository @Inject constructor(
 
                     }
 
-                val homeBlogs =  homeBlogsArticles?.map { article ->
+                val homeBlogs = homeBlogsArticles.map { article ->
                     LatestBlogs(article.image)
 
                 }
 
                 blogDataBase.withTransaction {
 
-                    if (homeBlogsArticles != null) {
-                        blogDao.insertBlogFeed(homeBlogsArticles)
-                    }
+                    blogDao.insertBlogFeed(homeBlogsArticles)
+                    blogDao.insertBlogs(homeBlogs)
 
 
                 }

@@ -11,7 +11,7 @@ interface BlogDao {
 
 
 
-        @Query("SELECT * FROM  blog_articles ")
+        @Query("SELECT * FROM   blog_articles  ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
         @Query("SELECT * FROM  blog_articles ")
@@ -24,7 +24,7 @@ interface BlogDao {
         fun getAllBookmarkedBlogs(): Flow<List<Blog>>
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        suspend fun insertBlogs(articles: Blog)
+        suspend fun insertBlogs(articles: List<LatestBlogs>)
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         suspend fun insertBlogFeed(blogFeed: List<Blog>)

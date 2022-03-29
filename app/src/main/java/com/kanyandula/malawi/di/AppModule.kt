@@ -90,13 +90,7 @@ object AppModule {
 //    }
 
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+
 
     @Provides
     fun providesLoggingInterceptor(): HttpLoggingInterceptor {
@@ -109,10 +103,18 @@ object AppModule {
         httpLoggingInterceptor: HttpLoggingInterceptor,
        ) =
         OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     @Provides
