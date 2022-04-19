@@ -46,9 +46,9 @@ class BlogEntityMapper : DomainMapper<Blog, BlogDto> {
 
 
 
-//    fun  toEntityList(initial: List<BlogDto>): List<Blog>{
-//        return initial.map { mapFromDomainModel(it) }
-//    }
+    fun  toEntityList(initial: List<BlogDto>): List<Blog>{
+        return initial.map { mapFromDomainModel(it) }
+    }
 
 
 

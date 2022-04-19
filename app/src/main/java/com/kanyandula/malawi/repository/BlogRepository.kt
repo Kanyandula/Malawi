@@ -5,6 +5,7 @@ import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
@@ -18,6 +19,7 @@ import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -54,10 +56,10 @@ class BlogRepository @Inject constructor(
             fetch = {
 
 
-                val response  =  blogApi.getBreakingNews()
+                val response  = blogApi.getBreakingNews()
                 response.Blog
 
-//                    fetchBlogPost()
+//                   fetchBlogPost()
 //                response.blog
             },
 
@@ -67,7 +69,7 @@ class BlogRepository @Inject constructor(
                 val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
 
                 val homeBlogsArticles =
-                    serverBlogNewsArticles.map { serverBlogNewsArticle ->
+                    serverBlogNewsArticles?.map { serverBlogNewsArticle ->
                         val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
                             bookmarkedArticle.image == serverBlogNewsArticle.image
                         }
@@ -85,15 +87,19 @@ class BlogRepository @Inject constructor(
 
                     }
 
-                val homeBlogs = homeBlogsArticles.map { article ->
+                val homeBlogs = homeBlogsArticles?.map { article ->
                     LatestBlogs(article.image)
 
                 }
 
                 blogDataBase.withTransaction {
 
-                    blogDao.insertBlogFeed(homeBlogsArticles)
-                    blogDao.insertBlogs(homeBlogs)
+                    if (homeBlogsArticles != null) {
+                        blogDao.insertBlogFeed(homeBlogsArticles)
+                    }
+                    if (homeBlogs != null) {
+                        blogDao.insertBlogs(homeBlogs)
+                    }
 
 
                 }
@@ -222,20 +228,22 @@ class BlogRepository @Inject constructor(
     }
 
 
+    val responseLiveData = liveData(Dispatchers.IO) {
+        emit(fetchBlogPost())
+    }
 
 
-
-//    private suspend fun fetchBlogPost(): BlogResponse {
-//        val response = BlogResponse()
-//        try {
-//            response.Blog = blogRef.get().await().children.map { snapShot ->
-//                snapShot.getValue(Blog::class.java)!!
-//            }
-//        } catch (exception: Exception) {
-//            response.exception = exception
-//        }
-//        return response
-//    }
+    private suspend fun fetchBlogPost(): BlogResponse {
+        val response = BlogResponse()
+        try {
+            response.Blog = blogRef.get().await().children.map { snapShot ->
+                snapShot.getValue(Blog::class.java)!!
+            }
+        } catch (exception: Exception) {
+            response.exception = exception
+        }
+        return response
+    }
 
 
 
