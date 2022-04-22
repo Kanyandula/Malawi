@@ -20,6 +20,7 @@ import javax.inject.Inject
 class BlogViewModel @Inject constructor(
     private val repository: BlogRepository,
     private val connectivityManager: ConnectivityManager,
+
     ) : ViewModel() {
 
     private val eventChannel = Channel<Event>()
@@ -33,7 +34,7 @@ class BlogViewModel @Inject constructor(
 
     val fetchBlogPost = refreshTrigger.flatMapLatest { refresh ->
 
-        repository.getBlogPosts(
+        repository.fetchBlogPosts(
             refresh == Refresh.FORCE,
             onFetchSuccess = {
                 pendingScrollToTopAfterRefresh = true

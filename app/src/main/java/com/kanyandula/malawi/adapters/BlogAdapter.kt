@@ -34,7 +34,7 @@ class BlogAdapter(
                 val article = getItem(position)
                 if (article != null) {
                     onBookmarkClick(article)
-                    article.title?.let { callbackWeakRef.get()?.onFavoriteStatusChanged(it, newStatus = equals(Any()) ) }
+                   // article.title?.let { callbackWeakRef.get()?.onFavoriteStatusChanged(it, newStatus = equals(Any()) ) }
 
 
                 }

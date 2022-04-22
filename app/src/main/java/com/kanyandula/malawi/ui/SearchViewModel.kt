@@ -32,7 +32,7 @@ class SearchViewModel @Inject constructor(
 
 
 
-
+    private var refreshOnInit = false
 
     @ExperimentalCoroutinesApi
     val searchResults = currentQuery.asFlow().flatMapLatest{ query ->
@@ -43,7 +43,7 @@ class SearchViewModel @Inject constructor(
 
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    private var refreshOnInit = false
+
 
     var refreshInProgress = false
     var pendingScrollToTopAfterRefresh = false

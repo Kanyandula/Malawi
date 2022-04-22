@@ -20,7 +20,7 @@ data class Blog(
     val uid: String? = null,
     val userName: String? = null,
     val timestamp: String? = null,
-    val favorite: Boolean = false,
+    var favorite: Boolean = false,
 
     ): Serializable{
 
