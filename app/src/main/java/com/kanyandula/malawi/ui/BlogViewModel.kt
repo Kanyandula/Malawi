@@ -34,7 +34,7 @@ class BlogViewModel @Inject constructor(
 
     val fetchBlogPost = refreshTrigger.flatMapLatest { refresh ->
 
-        repository.fetchBlogPosts(
+        repository.getFeed(
             refresh == Refresh.FORCE,
             onFetchSuccess = {
                 pendingScrollToTopAfterRefresh = true
@@ -59,6 +59,8 @@ class BlogViewModel @Inject constructor(
             viewModelScope.launch {
                 refreshTriggerChannel.send(Refresh.NORMAL)
             }
+
+            //repository.blogDao.insertBlogs(fetchBlogPost)
         }
     }
     @ExperimentalCoroutinesApi
@@ -68,6 +70,24 @@ class BlogViewModel @Inject constructor(
                 refreshTriggerChannel.send(Refresh.FORCE)
             }
         }
+    }
+
+    fun saveBlogs(blogs: List<Blog>){
+        val currentBlog = blogs.map {
+            blog ->
+            blog.date
+            blog.desc
+            blog.favorite
+            blog.image
+            blog.title
+            blog.userName
+            blog.uid
+        }
+
+        viewModelScope.launch {
+
+        }
+
     }
 
     fun onBookmarkClick(blog: Blog) {

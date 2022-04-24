@@ -12,7 +12,7 @@ interface BlogDao {
 
 
 
-        @Query("SELECT * FROM   blog_articles  ")
+        @Query("SELECT * FROM  blog_articles   ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
         @Query("SELECT * FROM  blog_articles ")
@@ -21,8 +21,8 @@ interface BlogDao {
         @Insert
         suspend fun insertBlog(blog: Blog): Long
 
-        @Insert(onConflict = OnConflictStrategy.IGNORE)
-        suspend fun insertBlogs(blogs: List<Blog>): LongArray
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        suspend fun insertBlogs(blogs: List<Blog>)
 
 
         @Query("SELECT * FROM blog_articles WHERE favorite = 1")
@@ -32,7 +32,7 @@ interface BlogDao {
 //        fun getSearchResultArticlesPaged(query: String): PagingSource<Int, Blog>
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        suspend fun insertBlogFeed(blogFeed: List<Blog>)
+        suspend fun insertBlogFeed(blogFeed: List<LatestBlogs>)
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         suspend fun upsert(blog: Blog): Long

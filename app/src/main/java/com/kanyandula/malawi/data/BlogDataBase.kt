@@ -7,7 +7,7 @@ import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.data.model.SearchResult
 
 @Database(
-    entities = [Blog::class, SearchResult::class, LatestBlogs::class, SearchQueryRemoteKey::class],
+    entities = [Blog::class, LatestBlogs::class, SearchResult::class,  SearchQueryRemoteKey::class],
     version = 2
 )
 

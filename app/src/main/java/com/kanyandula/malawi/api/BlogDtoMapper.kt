@@ -25,7 +25,7 @@ class BlogDtoMapper : DomainMapper<BlogDto, Blog> {
      */
 
 
-    override fun mapFromDomainModel(domainModel: BlogDto): BlogDto {
+    override fun mapFromDomainModel(domainModel: Blog): BlogDto {
         return BlogDto(
             title = domainModel.title,
             date =  domainModel.date,

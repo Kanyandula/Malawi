@@ -4,20 +4,16 @@ package com.kanyandula.malawi.repository
 import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.annotation.NonNull
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import androidx.room.PrimaryKey
 import androidx.room.withTransaction
+
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
@@ -27,10 +23,12 @@ import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
+import com.kanyandula.malawi.utils.networkBoundResource1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
@@ -43,7 +41,7 @@ import javax.inject.Inject
 class BlogRepository @Inject constructor(
     private  val blogApi: BlogApi,
     private var blogRef: DatabaseReference,
-    private var   blogDataBase: BlogDataBase,
+    private val   blogDataBase: BlogDataBase,
     private val entityMapper: BlogEntityMapper,
     private val blogDtoMapper: BlogDtoMapper,
     private val databaseAuth: FirebaseAuth
@@ -51,7 +49,30 @@ class BlogRepository @Inject constructor(
 
 
 
-    private  val blogDao = blogDataBase.blogDao()
+     val blogDao = blogDataBase.blogDao()
+
+    fun getFeed(
+        forceRefresh: Boolean,
+        onFetchSuccess: () -> Unit,
+        onFetchFailed: (Throwable) -> Unit
+    )= networkBoundResource1(
+        query = {
+            blogDao.getAllBlogFeed()
+        },
+        fetch = {
+            delay(2000)
+            val response =  blogApi.getBreakingNews()
+            response.blog
+        },
+        saveFetchResult = {  serverBlogArticles ->
+
+            blogDataBase.withTransaction {
+                blogDao.insertBlogs(serverBlogArticles)
+            }
+        }
+        )
+
+
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,23 +88,55 @@ class BlogRepository @Inject constructor(
 
             fetch = {
 
-               fetchBlogPost().Blog
+              // fetchBlogPost().blog
 
 
-//                val response  = blogApi.getBreakingNews()
-//                response.Blog
+             //  val response  = blogApi.getBreakingNews()
+               // response.blog
 
-//                   fetchBlogPost()
-//                response.blog
+         val response      =  fetchBlogPost()
+              response.blog
             },
 
             saveFetchResult = {
-                    val blogs =  fetchBlogPost().Blog
-                if (blogs != null) {
-                    blogDao.insertBlogs(blogs)
+                    serverBlogArticles ->
+
+                val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
+
+                val blogArticles =
+                    serverBlogArticles?.map { serverBlogArticle ->
+                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
+                            bookmarkedArticle.image == serverBlogArticle.image
+
+                        }
+
+                        Blog(
+                            title = serverBlogArticle.title,
+                            date = serverBlogArticle.date,
+                            desc = serverBlogArticle.desc,
+                            image = serverBlogArticle.image,
+                            timestamp = serverBlogArticle.timestamp,
+                            time = serverBlogArticle.time,
+                            uid = serverBlogArticle.uid,
+                            favorite = isBookmarked
+
+                        )
+                    }
+
+                val blogPost = blogArticles!!.map { article ->
+                    LatestBlogs(article.image)
                 }
 
-
+                blogDataBase.withTransaction {
+                    if (blogArticles != null) {
+                        blogDao.insertBlogs(blogArticles)
+                        blogDao.insertBlogFeed(blogPost)
+                    }
+                }
+//                 val blogs =   blogApi.getBreakingNews().blog
+//                if (blogs != null) {
+//                   blogDao.insertBlogs(blogs)
+//                }
 
 
 
@@ -254,7 +307,7 @@ class BlogRepository @Inject constructor(
     private suspend fun fetchBlogPost(): BlogResponse {
         val response = BlogResponse()
         try {
-            response.Blog = blogRef.get().await().children.map { snapShot ->
+            response.blog = blogRef.get().await().children.map { snapShot ->
                 snapShot.getValue(Blog::class.java)!!
             }
         } catch (exception: Exception) {

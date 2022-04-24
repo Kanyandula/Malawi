@@ -3,7 +3,9 @@
 //
 //import android.util.Log
 //import com.google.firebase.database.DatabaseReference
+//import com.kanyandula.malawi.api.BlogApi
 //import com.kanyandula.malawi.api.BlogDto
+//import com.kanyandula.malawi.api.BlogDtoMapper
 //import com.kanyandula.malawi.api.BlogResponse
 //import com.kanyandula.malawi.data.BlogDao
 //import com.kanyandula.malawi.data.DataState
@@ -20,7 +22,8 @@
 //    private var blogRef: DatabaseReference,
 //    private val blogDao: BlogDao,
 //    private val entityMapper: BlogEntityMapper,
-//    //private val blogDtoMapper: BlogDtoMapper
+//    private val blogDtoMapper: BlogDtoMapper,
+//    private  val retrofitService : BlogApi
 //) {
 //
 //    fun execute(
@@ -32,19 +35,17 @@
 //            delay(1000)
 //
 //            var blog =  getBlogFromCache()
-//            if (blog != null){
-//                emit(DataState.success(blog))
-//            }else{
+//
 //                if (isNetworkAvailable) {
 //
-//                    val networkBlog = fetchBlogPost()
+//                    val networkBlog = getBlogsFromNetwork()
 //
 //                    //insert into cache
-//                    networkBlog.Blog?.forEach {
-//                            e ->
-//                        blogDao.insertBlog(e)
 //
-//                    }
+//
+//                        blogDao.insertBlogs(entityMapper.toEntityList(networkBlog))
+//
+//
 //
 //
 //
@@ -57,13 +58,20 @@
 //                else{
 //                    throw  Exception("Unable to get blog from cache.")
 //                }
-//            }
+//
 //
 //        }catch (e:Exception){
 //            Log.e(TAG, "execute: ${e.message}")
 //            emit(DataState.error(e.message?: "Unknown error"))
 //        }
 //
+//
+//    }
+//
+//    private suspend fun  getBlogsFromNetwork():List<BlogDto>{
+//        return blogDtoMapper.toDomainList(
+//            retrofitService.getBreakingNews()
+//        )
 //
 //    }
 //
@@ -79,8 +87,8 @@
 //    private suspend fun fetchBlogPost(): BlogResponse {
 //        val response = BlogResponse()
 //        try {
-//            response.Blog = blogRef.get().await().children.map { snapShot ->
-//                snapShot.getValue(Blog::class.java)!!
+//            response.blog = blogRef.get().await().children.map { snapShot ->
+//                snapShot.getValue(BlogDto::class.java)!!
 //            }
 //        } catch (exception: Exception) {
 //            response.exception = exception
