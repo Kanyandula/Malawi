@@ -20,7 +20,7 @@ class BookMarkViewModel @Inject constructor(
 
     fun  onBookMarkClick (blog: Blog){
         val currentBookmarked = blog.favorite
-        val updateBlog = blog.copy( favorite = !currentBookmarked!!)
+        val updateBlog = blog.copy( favorite = !currentBookmarked)
         viewModelScope.launch {
             repository.updateBlogs(updateBlog)
         }

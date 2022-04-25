@@ -60,7 +60,7 @@ class BlogViewModel @Inject constructor(
                 refreshTriggerChannel.send(Refresh.NORMAL)
             }
 
-            //repository.blogDao.insertBlogs(fetchBlogPost)
+
         }
     }
     @ExperimentalCoroutinesApi
@@ -72,23 +72,7 @@ class BlogViewModel @Inject constructor(
         }
     }
 
-    fun saveBlogs(blogs: List<Blog>){
-        val currentBlog = blogs.map {
-            blog ->
-            blog.date
-            blog.desc
-            blog.favorite
-            blog.image
-            blog.title
-            blog.userName
-            blog.uid
-        }
 
-        viewModelScope.launch {
-
-        }
-
-    }
 
     fun onBookmarkClick(blog: Blog) {
         val currentlyBookmarked = blog.favorite

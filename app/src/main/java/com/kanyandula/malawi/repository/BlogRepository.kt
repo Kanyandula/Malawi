@@ -4,17 +4,14 @@ package com.kanyandula.malawi.repository
 import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.annotation.NonNull
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import androidx.room.PrimaryKey
 import androidx.room.withTransaction
 
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.kanyandula.malawi.api.BlogDto
 import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
@@ -47,8 +44,6 @@ class BlogRepository @Inject constructor(
     private val databaseAuth: FirebaseAuth
 ){
 
-
-
      val blogDao = blogDataBase.blogDao()
 
     fun getFeed(
@@ -60,130 +55,61 @@ class BlogRepository @Inject constructor(
             blogDao.getAllBlogFeed()
         },
         fetch = {
-            delay(2000)
-            val response =  blogApi.getBreakingNews()
-            response.blog
+             // blogApi.getBreakingNews().blogs
+            fetchBlogPost().blogs
+
+
         },
         saveFetchResult = {  serverBlogArticles ->
 
             blogDataBase.withTransaction {
-                blogDao.insertBlogs(serverBlogArticles)
+                if (serverBlogArticles != null) {
+                    blogDao.insertBlogs(serverBlogArticles)
+                }
             }
+        },
+        shouldFetch = { cachedArticles ->
+            if (forceRefresh) {
+                true
+            } else {
+                val sortedArticles = cachedArticles.sortedBy { article ->
+                    article.timestamp
+                }
+                val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
+                val needsRefresh = oldestTimestamp == null ||
+                        oldestTimestamp < (System.currentTimeMillis() -
+                        TimeUnit.MINUTES.toMillis(60)).toString()
+                needsRefresh
+            }
+        },
+
+        onFetchSuccess = onFetchSuccess,
+        onFetchFailed = { t ->
+            if (t !is HttpException && t !is IOException) {
+                throw t
+            }
+            onFetchFailed(t)
         }
-        )
-
-
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getBlogPosts(
-        forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
-    ): Flow<Resource<List<Blog>>> =
-        networkBoundResource(
-            query = {
-                blogDao.getAllBlogFeed()
-            },
-
-            fetch = {
-
-              // fetchBlogPost().blog
-
-
-             //  val response  = blogApi.getBreakingNews()
-               // response.blog
-
-         val response      =  fetchBlogPost()
-              response.blog
-            },
-
-            saveFetchResult = {
-                    serverBlogArticles ->
-
-                val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
-
-                val blogArticles =
-                    serverBlogArticles?.map { serverBlogArticle ->
-                        val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
-                            bookmarkedArticle.image == serverBlogArticle.image
-
-                        }
-
-                        Blog(
-                            title = serverBlogArticle.title,
-                            date = serverBlogArticle.date,
-                            desc = serverBlogArticle.desc,
-                            image = serverBlogArticle.image,
-                            timestamp = serverBlogArticle.timestamp,
-                            time = serverBlogArticle.time,
-                            uid = serverBlogArticle.uid,
-                            favorite = isBookmarked
-
-                        )
-                    }
-
-                val blogPost = blogArticles!!.map { article ->
-                    LatestBlogs(article.image)
-                }
-
-                blogDataBase.withTransaction {
-                    if (blogArticles != null) {
-                        blogDao.insertBlogs(blogArticles)
-                        blogDao.insertBlogFeed(blogPost)
-                    }
-                }
-//                 val blogs =   blogApi.getBreakingNews().blog
-//                if (blogs != null) {
-//                   blogDao.insertBlogs(blogs)
-//                }
-
-
-
-
-            },
-
-            shouldFetch = { cachedArticles ->
-                if (forceRefresh) {
-                    true
-                } else {
-                    val sortedArticles = cachedArticles.sortedBy { article ->
-                        article.timestamp
-                    }
-                    val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
-                    val needsRefresh = oldestTimestamp == null ||
-                            oldestTimestamp < (System.currentTimeMillis() -
-                            TimeUnit.MINUTES.toMillis(60)).toString()
-                    needsRefresh
-                }
-            },
-            onFetchSuccess = onFetchSuccess,
-            onFetchFailed = { t ->
-                if (t !is HttpException && t !is IOException) {
-                    throw t
-                }
-                onFetchFailed(t)
-            }
 
         )
+
+
 
     @ExperimentalCoroutinesApi
     fun fetchBlogPosts(
-        forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
-    ): Flow<Resource<List<Blog>>> =  callbackFlow<Resource<List<Blog>>> {
+
+    ): Flow<List<Blog>> =  callbackFlow<List<Blog>> {
         val blogPostListener = object : ValueEventListener{
 
             override fun onCancelled(error: DatabaseError) {
-                this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
+
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val items = snapshot.children.map { ds ->
                     ds.getValue(Blog::class.java)
                 }
-                this@callbackFlow.trySendBlocking(Resource.Success(items.filterNotNull()))
+                this@callbackFlow.trySendBlocking(items.filterNotNull())
             }
         }
         blogRef
@@ -196,11 +122,6 @@ class BlogRepository @Inject constructor(
 
 
     }
-
-
-
-
-
 
 
 
@@ -307,7 +228,7 @@ class BlogRepository @Inject constructor(
     private suspend fun fetchBlogPost(): BlogResponse {
         val response = BlogResponse()
         try {
-            response.blog = blogRef.get().await().children.map { snapShot ->
+            response.blogs = blogRef.get().await().children.map { snapShot ->
                 snapShot.getValue(Blog::class.java)!!
             }
         } catch (exception: Exception) {
@@ -317,25 +238,6 @@ class BlogRepository @Inject constructor(
     }
 
 
-
-//    private fun fetchBlogPost1() : MutableLiveData<BlogResponse> {
-//        val mutableLiveData = MutableLiveData<BlogResponse>()
-//        blogRef.get().addOnCompleteListener { task ->
-//            val response = BlogResponse()
-//            if (task.isSuccessful) {
-//                val result = task.result
-//                result?.let {
-//                    response.Blog = result.children.map { snapShot ->
-//                        snapShot.getValue(Blog::class.java)!!
-//                    }
-//                }
-//            } else {
-//                response.exception = task.exception
-//            }
-//            mutableLiveData.value = response
-//        }
-//        return mutableLiveData
-//    }
 
 
 
