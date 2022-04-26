@@ -49,7 +49,8 @@ class BlogRepository @Inject constructor(
             blogDao.getAllBlogFeed()
         },
         fetch = {
-            fetchBlogPost().blogs
+            blogApi.getBreakingNews().blogs
+           // fetchBlogPost().blogs
 
 
         },
