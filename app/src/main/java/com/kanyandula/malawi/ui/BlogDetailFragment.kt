@@ -19,7 +19,7 @@ class BlogDetailFragment : Fragment(R.layout.fragment_blog_detail) {
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val  viewModel: BlogViewModel by viewModels()
+    private val  viewModel: HomeViewModel by viewModels()
 
     private var currentBinding: FragmentBlogDetailBinding? = null
     private val binding get() = currentBinding!!

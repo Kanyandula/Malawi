@@ -2,7 +2,7 @@ package com.kanyandula.malawi.utils
 
 import kotlinx.coroutines.flow.*
 
-inline fun <ResultType, RequestType> networkBoundResource1(
+inline fun <ResultType, RequestType> networkBoundResource(
     crossinline query: () -> Flow<ResultType>,
     crossinline fetch: suspend () -> RequestType,
     crossinline saveFetchResult: suspend (RequestType) -> Unit,

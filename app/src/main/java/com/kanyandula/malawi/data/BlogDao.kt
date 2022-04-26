@@ -12,7 +12,7 @@ interface BlogDao {
 
 
 
-        @Query("SELECT * FROM  blog_articles   ")
+        @Query("SELECT * FROM  latest_blog   INNER JOIN blog_articles  ON  articleUrl = image ")
         fun getAllBlogFeed(): Flow<List<Blog>>
 
         @Query("SELECT * FROM  blog_articles ")
@@ -21,7 +21,7 @@ interface BlogDao {
         @Insert
         suspend fun insertBlog(blog: Blog): Long
 
-        @Insert(onConflict = OnConflictStrategy.IGNORE)
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
         suspend fun insertBlogs(blogs: List<Blog>)
 
 
@@ -46,7 +46,7 @@ interface BlogDao {
         @Query("UPDATE blog_articles SET favorite = 0")
         suspend fun resetAllBookmarks()
 
-        @Query("DELETE FROM  search_results")
+        @Query("DELETE FROM  latest_blog")
         suspend fun deleteAllBlogFeed()
 
         @Query("DELETE FROM blog_articles WHERE timestamp < :timestampInMillis AND favorite = 0")

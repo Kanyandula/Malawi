@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/blog_update_date"
                 android:text="@string/updated_on_july_23_2021"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/purple_700"
                 android:textSize="13sp"
                 android:layout_marginTop="10dp"
                 />

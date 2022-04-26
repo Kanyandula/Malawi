@@ -62,7 +62,7 @@
                 android:layout_marginStart="16dp"
                 android:fontFamily="@font/actor"
                 android:text="@string/about"
-                android:textColor="@color/white"
+                android:textColor="@color/purple_700"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 

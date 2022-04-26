@@ -4,12 +4,9 @@ package com.kanyandula.malawi.repository
 import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.room.withTransaction
 
 import com.bumptech.glide.load.HttpException
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.kanyandula.malawi.api.BlogDtoMapper
@@ -20,12 +17,9 @@ import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
-import com.kanyandula.malawi.utils.networkBoundResource1
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
@@ -44,28 +38,63 @@ class BlogRepository @Inject constructor(
     private val databaseAuth: FirebaseAuth
 ){
 
-     val blogDao = blogDataBase.blogDao()
+     private val blogDao = blogDataBase.blogDao()
 
     fun getFeed(
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit
-    )= networkBoundResource1(
+    )= networkBoundResource(
         query = {
             blogDao.getAllBlogFeed()
         },
         fetch = {
-             // blogApi.getBreakingNews().blogs
             fetchBlogPost().blogs
 
 
         },
         saveFetchResult = {  serverBlogArticles ->
 
+            val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
+
+            val newBlogs =
+                serverBlogArticles?.map { serverBlogArticle ->
+
+                    val isBookmarked = bookmarkedArticles.any { bookmarkedArticle ->
+                        bookmarkedArticle.image == serverBlogArticle.image
+                    }
+
+                    Blog(
+                        image = serverBlogArticle.image,
+                        title = serverBlogArticle.title,
+                        desc = serverBlogArticle.desc,
+                        timestamp = serverBlogArticle.timestamp,
+                        time = serverBlogArticle.time,
+                        userName = serverBlogArticle.userName,
+                        uid = serverBlogArticle.uid,
+                        favorite = isBookmarked
+
+                    )
+
+                    }
+
+            val blogs = newBlogs?.map { article ->
+                LatestBlogs(article.image)
+
+            }
+
             blogDataBase.withTransaction {
-                if (serverBlogArticles != null) {
-                    blogDao.insertBlogs(serverBlogArticles)
+
+                blogDao.deleteAllBlogFeed()
+
+                    if (newBlogs != null) {
+                        blogDao.insertBlogs(newBlogs)
+                    }
+
+                if (blogs != null) {
+                    blogDao.insertBlogFeed(blogs)
                 }
+
             }
         },
         shouldFetch = { cachedArticles ->
@@ -161,16 +190,6 @@ class BlogRepository @Inject constructor(
     }
 
 
-    fun signIn(auth: FirebaseAuth, email: String, password: String): Flow<Resource<AuthResult>> {
-        return flow {
-
-            val result = auth.signInWithEmailAndPassword(email, password)
-                .await()
-            emit(Resource.Success(result))
-
-        }
-
-    }
 
 
 
@@ -179,29 +198,7 @@ class BlogRepository @Inject constructor(
     }
 
 
-      fun searchForBlogs(str: String, liveData: MutableLiveData<List<Blog>>) {
 
-        blogRef.orderByChild("title")
-            .startAt(str).
-            endAt(str+"\uf8ff")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val blogFeedItems : List<Blog>  = snapshot.children.map { dataSnapshot ->
-                        dataSnapshot.getValue(Blog::class.java)!!
-
-                    }
-
-                    liveData.postValue(blogFeedItems)
-                }
-
-                override fun onCancelled(errorDatabase: DatabaseError) {
-
-
-                    // Nothing to do
-                }
-
-            })
-    }
 
     fun getAllBookmarkedBlogs(): Flow<List<Blog>> =
         blogDao.getAllBookmarkedBlogs()
@@ -217,11 +214,6 @@ class BlogRepository @Inject constructor(
 
     suspend fun deleteNonBookmarkedArticlesOlderThan(timestampInMillis: Long) {
         blogDao.deleteNonBookmarkedArticlesOlderThan(timestampInMillis)
-    }
-
-
-    val responseLiveData = liveData(Dispatchers.IO) {
-        emit(fetchBlogPost())
     }
 
 

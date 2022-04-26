@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
-class BlogViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val repository: BlogRepository,
     private val connectivityManager: ConnectivityManager,
 
@@ -120,9 +120,7 @@ class BlogViewModel @Inject constructor(
         data class ShowErrorMessage(val error: Throwable) : Event()
     }
 
-//    fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
-//        repository.updateFavoriteStatus(id, isFavorite)
-//    }
+
 
     fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
         repository.updateFavoriteStatus(id, isFavorite)

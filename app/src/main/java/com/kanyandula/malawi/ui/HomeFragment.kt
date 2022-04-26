@@ -19,15 +19,14 @@ import com.kanyandula.malawi.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import java.lang.ref.WeakReference
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemInterface {
+class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    private val  viewModel: BlogViewModel by viewModels()
+    private val  viewModel: HomeViewModel by viewModels()
     private var currentBinding: FragmentHomeBinding? = null
     private val binding get() = currentBinding!!
 
@@ -51,7 +50,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemI
 
             },
 
-            callbackWeakRef = WeakReference(this)
+
 
 
         )
@@ -100,7 +99,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemI
             viewModel.events.collect { event ->
 
                 when (event) {
-                    is BlogViewModel.Event.ShowErrorMessage ->
+                    is HomeViewModel.Event.ShowErrorMessage ->
                         showSnackbar(
                             getString(
                                 R.string.could_not_refresh
@@ -139,7 +138,5 @@ class HomeFragment : Fragment(R.layout.fragment_home), BlogAdapter.NewsFeedItemI
         currentBinding = null
     }
 
-    override fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean) {
-        viewModel.updateFavoriteStatus(newsFeedItemId, newStatus)
-    }
+
 }

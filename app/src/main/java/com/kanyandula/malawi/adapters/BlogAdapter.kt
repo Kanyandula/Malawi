@@ -11,12 +11,8 @@ import java.lang.ref.WeakReference
 class BlogAdapter(
     private val onItemClick: (Blog) -> Unit,
     private val onBookmarkClick: (Blog) -> Unit,
-    private val callbackWeakRef: WeakReference<NewsFeedItemInterface>
 ): ListAdapter<Blog, BlogViewHolder>(BlogArticleComparator()) {
 
-    interface NewsFeedItemInterface {
-        fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean)
-    }
 
 
 
@@ -34,7 +30,7 @@ class BlogAdapter(
                 val article = getItem(position)
                 if (article != null) {
                     onBookmarkClick(article)
-                   // article.title?.let { callbackWeakRef.get()?.onFavoriteStatusChanged(it, newStatus = equals(Any()) ) }
+
 
 
                 }

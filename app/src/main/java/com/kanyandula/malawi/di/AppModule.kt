@@ -73,23 +73,6 @@ object AppModule {
     }
 
 
-//    @ViewModelScoped
-//    @Provides
-//    fun  provideGetBlogPost(
-//        blogRef: DatabaseReference,
-//        blogDao: BlogDao,
-//        entityMapper: BlogEntityMapper
-//    ):GetBlogPost{
-//        return  GetBlogPost(
-//            blogRef = blogRef,
-//            blogDao = blogDao,
-//            entityMapper = entityMapper,
-//
-//        )
-//
-//    }
-
-
 
 
     @Provides

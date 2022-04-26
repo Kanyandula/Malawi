@@ -1,6 +1,9 @@
 package com.kanyandula.malawi.ui
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -17,7 +20,7 @@ import kotlinx.coroutines.flow.collect
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class BookMarkFragment : Fragment(R.layout.fragment_book_mark), BlogAdapter.NewsFeedItemInterface {
+class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
 
     private val viewModel: BookMarkViewModel by viewModels()
 
@@ -50,7 +53,7 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark), BlogAdapter.News
                 viewModel.onBookMarkClick(blog)
             },
 
-            callbackWeakRef = WeakReference(this)
+
         )
 
         blogAdapter.stateRestorationPolicy =
@@ -77,9 +80,22 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark), BlogAdapter.News
         }
 
 
-
+        setHasOptionsMenu(true)
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_bookmarks, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) =
+        when (item.itemId) {
+            R.id.action_delete_all_bookmarks -> {
+                viewModel.onDeleteAllBookmarks()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -87,9 +103,7 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark), BlogAdapter.News
     }
 
 
-    override fun onFavoriteStatusChanged(newsFeedItemId: String, newStatus: Boolean) {
-        viewModel.updateFavoriteStatus(newsFeedItemId, newStatus)
-    }
+
 }
 
 
