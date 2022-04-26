@@ -10,7 +10,7 @@ import java.io.Serializable
 @Entity(tableName = "blog_articles")
 data class Blog(
 
-    val date: String? = null,
+    var date: String? = null,
     val title: String? = null,
     val desc: String? = null,
     @PrimaryKey

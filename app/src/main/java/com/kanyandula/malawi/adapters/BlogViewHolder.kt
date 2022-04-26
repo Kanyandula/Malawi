@@ -20,7 +20,7 @@ class BlogViewHolder(
                 .into(blogImage)
             blogTitle.text = blog.title ?: ""
             blogAuthor.text = blog.userName?: ""
-            blogUpdateDate.text = blog.date?: ""
+            blogUpdateDate.text = blog.time?: ""
 
             imageViewBookmark.setImageResource(
                 when {

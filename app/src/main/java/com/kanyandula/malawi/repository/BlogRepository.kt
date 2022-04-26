@@ -102,9 +102,9 @@ class BlogRepository @Inject constructor(
                 true
             } else {
                 val sortedArticles = cachedArticles.sortedBy { article ->
-                    article.timestamp
+                    article.time
                 }
-                val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
+                val oldestTimestamp = sortedArticles.firstOrNull()?.time
                 val needsRefresh = oldestTimestamp == null ||
                         oldestTimestamp < (System.currentTimeMillis() -
                         TimeUnit.MINUTES.toMillis(60)).toString()
@@ -234,4 +234,6 @@ class BlogRepository @Inject constructor(
 
 
 }
+
+
 

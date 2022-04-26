@@ -6,7 +6,7 @@ package com.kanyandula.malawi.api
 
 data class BlogDto (
 
-    val date: String? = null,
+    var date: String? = null,
     val title: String? = null,
     val desc: String? = null,
    val image: String = "",
