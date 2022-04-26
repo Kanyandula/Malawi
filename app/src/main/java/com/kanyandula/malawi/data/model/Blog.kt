@@ -19,7 +19,7 @@ data class Blog(
     val time: String? = null,
     val uid: String? = null,
     val userName: String? = null,
-    val timestamp: String? = null,
+    val timestamp: Long = System.currentTimeMillis(),
     var favorite: Boolean = false,
 
     ): Serializable{

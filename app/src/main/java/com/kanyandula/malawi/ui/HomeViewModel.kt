@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(
 
     val fetchBlogPost = refreshTrigger.flatMapLatest { refresh ->
 
-        repository.getFeed(
+        repository.getBlogFeed(
             refresh == Refresh.FORCE,
             onFetchSuccess = {
                 pendingScrollToTopAfterRefresh = true

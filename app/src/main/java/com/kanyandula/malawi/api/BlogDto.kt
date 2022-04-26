@@ -14,7 +14,7 @@ data class BlogDto (
     val name: String? = null,
     val uid: String? = null,
     val userName: String? = null,
-    val timestamp:String? = null,
+    val timestamp:Long = System.currentTimeMillis(),
     val favorite: Boolean = false,
 
         )

@@ -37,10 +37,9 @@ class BlogRepository @Inject constructor(
     private val blogDtoMapper: BlogDtoMapper,
     private val databaseAuth: FirebaseAuth
 ){
-
      private val blogDao = blogDataBase.blogDao()
 
-    fun getFeed(
+    fun getBlogFeed(
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit
@@ -49,10 +48,7 @@ class BlogRepository @Inject constructor(
             blogDao.getAllBlogFeed()
         },
         fetch = {
-            blogApi.getBreakingNews().blogs
-           // fetchBlogPost().blogs
-
-
+            fetchBlogPost().blogs
         },
         saveFetchResult = {  serverBlogArticles ->
 
@@ -67,6 +63,7 @@ class BlogRepository @Inject constructor(
 
                     Blog(
                         image = serverBlogArticle.image,
+                        date = serverBlogArticle.date,
                         title = serverBlogArticle.title,
                         desc = serverBlogArticle.desc,
                         timestamp = serverBlogArticle.timestamp,
@@ -81,9 +78,7 @@ class BlogRepository @Inject constructor(
 
             val blogs = newBlogs?.map { article ->
                 LatestBlogs(article.image)
-
             }
-
             blogDataBase.withTransaction {
 
                 blogDao.deleteAllBlogFeed()
@@ -95,7 +90,6 @@ class BlogRepository @Inject constructor(
                 if (blogs != null) {
                     blogDao.insertBlogFeed(blogs)
                 }
-
             }
         },
         shouldFetch = { cachedArticles ->
@@ -103,16 +97,15 @@ class BlogRepository @Inject constructor(
                 true
             } else {
                 val sortedArticles = cachedArticles.sortedBy { article ->
-                    article.time
+                    article.timestamp
                 }
-                val oldestTimestamp = sortedArticles.firstOrNull()?.time
+                val oldestTimestamp = sortedArticles.firstOrNull()?.timestamp
                 val needsRefresh = oldestTimestamp == null ||
-                        oldestTimestamp < (System.currentTimeMillis() -
-                        TimeUnit.MINUTES.toMillis(60)).toString()
+                        oldestTimestamp < System.currentTimeMillis() -
+                        TimeUnit.MINUTES.toMillis(60)
                 needsRefresh
             }
         },
-
         onFetchSuccess = onFetchSuccess,
         onFetchFailed = { t ->
             if (t !is HttpException && t !is IOException) {
@@ -124,34 +117,6 @@ class BlogRepository @Inject constructor(
         )
 
 
-
-    @ExperimentalCoroutinesApi
-    fun fetchBlogPosts(
-
-    ): Flow<List<Blog>> =  callbackFlow<List<Blog>> {
-        val blogPostListener = object : ValueEventListener{
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val items = snapshot.children.map { ds ->
-                    ds.getValue(Blog::class.java)
-                }
-                this@callbackFlow.trySendBlocking(items.filterNotNull())
-            }
-        }
-        blogRef
-            .addValueEventListener(blogPostListener)
-
-        awaitClose {
-            blogRef
-                .removeEventListener(blogPostListener)
-        }
-
-
-    }
 
 
 
