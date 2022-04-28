@@ -1,6 +1,7 @@
 package com.kanyandula.malawi.ui
 
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.repository.BlogRepository
 import com.kanyandula.malawi.utils.Resource
@@ -19,18 +20,14 @@ class SearchViewModel @Inject constructor(
     state: SavedStateHandle
 ) : ViewModel() {
 
-    private val eventChannel = Channel<Event>()
-    val events = eventChannel.receiveAsFlow()
-    private val refreshTriggerChannel = Channel<Refresh>()
-    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
+//    private val eventChannel = Channel<Event>()
+//    val events = eventChannel.receiveAsFlow()
+//    private val refreshTriggerChannel = Channel<Refresh>()
+//    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
 
 
     private  val currentQuery = state.getLiveData<String?>("currentQuery", null)
     val hasCurrentQuery = currentQuery.asFlow().map { it != null }
-
-    val query = MutableLiveData<String>()
-
-
 
     private var refreshOnInit = false
 
@@ -38,10 +35,10 @@ class SearchViewModel @Inject constructor(
     val searchResults = currentQuery.asFlow().flatMapLatest{ query ->
         query?.let {
 
-            repository.searchForBlogs(query,refreshOnInit)
+            repository.getSearchResultsPaged(query,refreshOnInit)
         }?: emptyFlow()
 
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }.cachedIn(viewModelScope)
 
 
 
@@ -93,23 +90,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun onStart() {
-        if (searchResults.value !is Resource.Loading) {
-            viewModelScope.launch {
-                refreshTriggerChannel.send(Refresh.NORMAL)
-            }
-        }
-    }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun onManualRefresh() {
-        if (searchResults.value !is Resource.Loading) {
-            viewModelScope.launch {
-                refreshTriggerChannel.send(Refresh.FORCE)
-            }
-        }
-    }
 
     private enum class Refresh {
         FORCE, NORMAL
@@ -123,6 +104,11 @@ class SearchViewModel @Inject constructor(
 
     fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
         repository.updateFavoriteStatus(id, isFavorite)
+    }
+
+
+    fun searchDatabase(searchQuery: String): LiveData<List<Blog>> {
+        return repository.searchDatabase(searchQuery).asLiveData()
     }
 
 }

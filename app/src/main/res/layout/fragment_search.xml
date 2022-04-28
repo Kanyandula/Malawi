@@ -22,6 +22,17 @@
                 android:layout_height="match_parent"
                 />
 
+            <TextView
+                android:id="@+id/text_view_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/button_retry"
+                android:layout_margin="8dp"
+                android:gravity="center_horizontal"
+                android:visibility="gone"
+                tools:text="An error occurred"
+                tools:visibility="visible" />
+
 
 
             <Button

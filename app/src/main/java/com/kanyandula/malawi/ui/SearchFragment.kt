@@ -4,6 +4,7 @@ package com.kanyandula.malawi.ui
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import androidx.fragment.app.Fragment
@@ -14,14 +15,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.kanyandula.malawi.utils.showSnackbar
 import com.kanyandula.malawi.R
 import com.kanyandula.malawi.adapters.BlogAdapter
+import com.kanyandula.malawi.adapters.BlogArticleLoadStateAdapter
+import com.kanyandula.malawi.adapters.BlogArticlePagingAdapter
 import com.kanyandula.malawi.databinding.FragmentSearchBinding
-import com.kanyandula.malawi.utils.Resource
-import com.kanyandula.malawi.utils.exhaustive
-import com.kanyandula.malawi.utils.onQueryTextSubmit
+import com.kanyandula.malawi.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_search.*
@@ -30,6 +31,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import java.lang.ref.WeakReference
 
 @InternalCoroutinesApi
@@ -42,17 +45,17 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
     private var currentBinding: FragmentSearchBinding? = null
     private val binding get() = currentBinding!!
-
+    private lateinit var mainBlogAdapter: BlogAdapter
 
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+
 
          currentBinding = FragmentSearchBinding.bind(view)
 
-        val blogAdapter = BlogAdapter(
+        val blogAdapter = BlogArticlePagingAdapter(
             onItemClick = {
                 viewModel.addToRecentlyViedBlogs(it)
                 val bundle = Bundle().apply {
@@ -70,62 +73,113 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
         )
 
+
+
         binding.apply {
             resultList.apply {
-                adapter = blogAdapter
+                adapter = blogAdapter.withLoadStateFooter(
+                    BlogArticleLoadStateAdapter(blogAdapter::retry)
+                )
                 layoutManager = LinearLayoutManager(requireContext())
-                //layoutManager = LinearLayoutManager(context)
                 setHasFixedSize(true)
                 itemAnimator?.changeDuration = 0
             }
 
 
+
+
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.searchResults.collectLatest { data ->
-                    val result = data ?: return@collectLatest
-                    swipeRefreshLayout.isRefreshing = result is Resource.Loading
-                    resultList.isVisible = !result.data.isNullOrEmpty()
-                    buttonRetry.isVisible = result.error != null && result.data.isNullOrEmpty()
-                    blogAdapter.submitList(result.data) {
-                        if (viewModel.pendingScrollToTopAfterRefresh) {
-                            resultList.scrollToPosition(0)
-                            viewModel.pendingScrollToTopAfterRefresh = false
-                        }
-                    }
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                viewModel.events.collect { event ->
-
-                    when (event) {
-                        is SearchViewModel.Event.ShowErrorMessage ->
-                            showSnackbar(
-                                getString(
-                                    R.string.could_not_refresh
-                                )
-                            )
-
-                        else -> {}
-                    }.exhaustive
+                    Log.d("TAG", "$data")
+                    blogAdapter.submitData(data)
 
                 }
-
             }
 
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.hasCurrentQuery.collect { hasCurrentQuery ->
+
                     textViewInstructions.isVisible = !hasCurrentQuery
-                    swipeRefreshLayout.isVisible = hasCurrentQuery
+                    swipeRefreshLayout.isEnabled = hasCurrentQuery
 
                     if (!hasCurrentQuery) {
-                        result_list.isVisible = false
+                        resultList.isVisible = false
                     }
                 }
             }
 
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                blogAdapter.loadStateFlow
+                     .distinctUntilChangedBy { it.source.refresh }
+                    .filter { it.source.refresh is LoadState.NotLoading }
+                    .collect {
+                        if (viewModel.pendingScrollToTopAfterNewQuery) {
+                            resultList.scrollToPosition(0)
+                            viewModel.pendingScrollToTopAfterNewQuery = false
+                        }
+                        if (viewModel.pendingScrollToTopAfterRefresh && it.mediator?.refresh is LoadState.NotLoading) {
+                            resultList.scrollToPosition(0)
+                            viewModel.pendingScrollToTopAfterRefresh = false
+                        }
+                    }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                blogAdapter.loadStateFlow
+                    .collect { loadState ->
+                        when (val refresh = loadState.mediator?.refresh) {
+                            is LoadState.Loading -> {
+                                textViewError.isVisible = false
+                                buttonRetry.isVisible = false
+                                swipeRefreshLayout.isRefreshing = true
+                                textViewNoResults.isVisible = false
+
+                                resultList.showIfOrInvisible {
+                                    !viewModel.newQueryInProgress &&  blogAdapter.itemCount > 0
+                                }
+
+                                viewModel.refreshInProgress = true
+                                viewModel.pendingScrollToTopAfterRefresh = true
+                            }
+                            is LoadState.Error -> {
+                                swipeRefreshLayout.isRefreshing = false
+                                textViewNoResults.isVisible = false
+                                resultList.isVisible = blogAdapter.itemCount > 0
+
+                                val noCachedResults =
+                                    blogAdapter.itemCount < 1 && loadState.source.append.endOfPaginationReached
+
+                                textViewError.isVisible = noCachedResults
+                                buttonRetry.isVisible = noCachedResults
+
+                                val errorMessage = getString(
+                                    R.string.could_not_load_search_results,
+                                    refresh.error.localizedMessage
+                                        ?: getString(R.string.unknown_error_occurred)
+                                )
+                                textViewError.text = errorMessage
+
+                                if (viewModel.refreshInProgress) {
+                                    showSnackbar(errorMessage)
+                                }
+                                viewModel.refreshInProgress = false
+                                viewModel.newQueryInProgress = false
+                                viewModel.pendingScrollToTopAfterRefresh = false
+                            }
+
+                        }
+
+                    }
+            }
+
+            swipeRefreshLayout.setOnRefreshListener {
+                blogAdapter.refresh()
+            }
+
 
         }
+
+        setHasOptionsMenu(true)
 
     }
 
@@ -138,13 +192,25 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
         val searchView = searchItem?.actionView as SearchView
 
         searchView. onQueryTextSubmit{ query ->
-            val searchText = query.trim()
+            val searchText = "%$query%"
             viewModel.onSearchQuerySubmit(searchText)
+
+
             searchView.clearFocus()
         }
 
 
 
+    }
+
+    private fun searchDatabase(query: String) {
+        val searchQuery = "%$query%"
+
+        viewModel.searchDatabase(searchQuery).observe(this, { list ->
+            list.let {
+                mainBlogAdapter.submitList(it)
+            }
+        })
     }
 
 

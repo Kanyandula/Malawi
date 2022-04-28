@@ -4,6 +4,10 @@ package com.kanyandula.malawi.repository
 import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.room.withTransaction
 
 import com.bumptech.glide.load.HttpException
@@ -13,6 +17,7 @@ import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.data.BlogDataBase
+import com.kanyandula.malawi.data.SearchNewsRemoteMediator
 import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
@@ -42,7 +47,7 @@ class BlogRepository @Inject constructor(
     fun getBlogFeed(
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
+        onFetchFailed: (Throwable) -> Unit,
     )= networkBoundResource(
         query = {
             blogDao.getAllBlogFeed()
@@ -115,6 +120,22 @@ class BlogRepository @Inject constructor(
         }
 
         )
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun getSearchResultsPaged(
+        query: String,
+        refreshOnInit: Boolean
+    ): Flow<PagingData<Blog>> =
+        Pager(
+            config = PagingConfig(pageSize = 20, maxSize = 200),
+            pagingSourceFactory = { blogDao.getSearchResultBlogPaged(query) }
+        ).flow
+
+
+    fun searchDatabase(searchQuery: String): Flow<List<Blog>> {
+        return blogDao.searchDatabase(searchQuery)
+    }
+
 
 
 
@@ -195,6 +216,22 @@ class BlogRepository @Inject constructor(
         return response
     }
 
+
+    private suspend fun searchBlogPost(str: String): BlogResponse {
+        val response = BlogResponse()
+        try {
+            response.blogs = blogRef.orderByChild("title")
+                .startAt(str).
+                endAt(str+"\uf8ff").
+
+                get().await().children.map { snapShot ->
+                    snapShot.getValue(Blog::class.java)!!
+                }
+        } catch (exception: Exception) {
+            response.exception = exception
+        }
+        return response
+    }
 
 
 

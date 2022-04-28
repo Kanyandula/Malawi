@@ -34,10 +34,10 @@ data class LatestBlogs(
 )
 
 
-@Entity(tableName = "search_results", primaryKeys = ["searchQuery", "title"]  )
+@Entity(tableName = "search_results", primaryKeys = ["searchQuery", "articleUrl"]  )
 data class SearchResult(
     val searchQuery: String,
-    val title: String,
+    val articleUrl: String,
     val queryPosition: Int
 
 

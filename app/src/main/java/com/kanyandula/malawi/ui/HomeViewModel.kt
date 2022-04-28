@@ -49,9 +49,6 @@ class HomeViewModel @Inject constructor(
 
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    init {
-
-    }
 
     @ExperimentalCoroutinesApi
     fun onStart() {
