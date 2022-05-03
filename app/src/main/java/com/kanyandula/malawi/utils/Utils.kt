@@ -31,8 +31,11 @@ inline fun SearchView.onQueryTextSubmit(crossinline listener: (String) -> Unit) 
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-
-            
+            if (!query.isNullOrBlank()) {
+                if (newText != null) {
+                    listener(newText)
+                }
+            }
             return true
         }
     })

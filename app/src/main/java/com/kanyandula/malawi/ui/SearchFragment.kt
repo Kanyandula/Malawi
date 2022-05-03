@@ -211,7 +211,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
             viewModel.onSearchQuerySubmit(query)
 
-            searchView.clearFocus()
+
         }
 
 
