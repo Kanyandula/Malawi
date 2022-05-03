@@ -2,8 +2,10 @@ package com.kanyandula.malawi.data.model
 
 
 import androidx.annotation.NonNull
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 
@@ -12,6 +14,7 @@ data class Blog(
 
     var date: String? = null,
     val title: String? = null,
+   //@ColumnInfo(name ="description")
     val desc: String? = null,
     @PrimaryKey
     @NonNull

@@ -8,7 +8,7 @@ import com.kanyandula.malawi.data.model.SearchResult
 
 @Database(
     entities = [Blog::class, LatestBlogs::class, SearchResult::class,  SearchQueryRemoteKey::class],
-    version = 5
+    version = 6
 )
 
 abstract class BlogDataBase : RoomDatabase(){
