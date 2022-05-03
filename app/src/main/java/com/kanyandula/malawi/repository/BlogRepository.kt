@@ -4,10 +4,7 @@ package com.kanyandula.malawi.repository
 import com.kanyandula.malawi.api.BlogApi
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import androidx.paging.*
 import androidx.room.withTransaction
 
 import com.bumptech.glide.load.HttpException
@@ -130,6 +127,18 @@ class BlogRepository @Inject constructor(
             config = PagingConfig(pageSize = 20, maxSize = 200),
             pagingSourceFactory = { blogDao.getSearchResultBlogPaged(query) }
         ).flow
+
+    fun getSearchResults(query: String, refreshOnInit: Boolean) =
+        Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                maxSize = 100,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { blogDao.getSearchResultBlogPaged(query) }
+        ).liveData
+
+
 
 
     fun searchDatabase(searchQuery: String): Flow<List<Blog>> {

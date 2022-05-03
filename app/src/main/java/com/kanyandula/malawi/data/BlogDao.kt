@@ -32,7 +32,7 @@ interface BlogDao {
         @Query("SELECT * FROM search_results INNER JOIN blog_articles ON articleUrl = image WHERE searchQuery = :query ORDER BY queryPosition")
         fun getSearchResultArticlesPaged(query: String): PagingSource<Int, Blog>
 
-        @Query("SELECT * FROM blog_articles WHERE title LIKE :query OR desc LIKE :query")
+        @Query("SELECT * FROM blog_articles WHERE title LIKE '%' || :query || '%' OR  desc LIKE '%' || :query || '%' ORDER BY date ")
         fun getSearchResultBlogPaged(query: String): PagingSource<Int, Blog>
 
         @Query("SELECT * FROM blog_articles WHERE title LIKE :query OR desc LIKE :query")

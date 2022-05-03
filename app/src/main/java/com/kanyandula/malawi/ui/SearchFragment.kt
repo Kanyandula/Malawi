@@ -18,22 +18,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kanyandula.malawi.R
-import com.kanyandula.malawi.adapters.BlogAdapter
 import com.kanyandula.malawi.adapters.BlogArticleLoadStateAdapter
 import com.kanyandula.malawi.adapters.BlogArticlePagingAdapter
 import com.kanyandula.malawi.databinding.FragmentSearchBinding
 import com.kanyandula.malawi.utils.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_search.*
-import kotlinx.android.synthetic.main.fragment_search.button_retry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
-import java.lang.ref.WeakReference
 
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -45,7 +40,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
     private var currentBinding: FragmentSearchBinding? = null
     private val binding get() = currentBinding!!
-    private lateinit var mainBlogAdapter: BlogAdapter
+    private lateinit var mainBlogAdapter: BlogArticlePagingAdapter
 
 
 
@@ -55,7 +50,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
          currentBinding = FragmentSearchBinding.bind(view)
 
-        val blogAdapter = BlogArticlePagingAdapter(
+        mainBlogAdapter = BlogArticlePagingAdapter(
             onItemClick = {
                 viewModel.addToRecentlyViedBlogs(it)
                 val bundle = Bundle().apply {
@@ -77,8 +72,8 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
         binding.apply {
             resultList.apply {
-                adapter = blogAdapter.withLoadStateFooter(
-                    BlogArticleLoadStateAdapter(blogAdapter::retry)
+                adapter = mainBlogAdapter.withLoadStateFooter(
+                    BlogArticleLoadStateAdapter(mainBlogAdapter::retry)
                 )
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
@@ -88,17 +83,26 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
 
 
+//            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+//                viewModel.searchBlogPost.observe(viewLifecycleOwner) { data ->
+//                    Log.d("TAG", "$data")
+//                    blogAdapter.submitData(viewLifecycleOwner.lifecycle,data)
+//
+//                }
+//            }
+
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.searchResults.collectLatest { data ->
                     Log.d("TAG", "$data")
-                    blogAdapter.submitData(data)
+                    mainBlogAdapter.submitData(data)
 
                 }
             }
 
+
+
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.hasCurrentQuery.collect { hasCurrentQuery ->
-
                     textViewInstructions.isVisible = !hasCurrentQuery
                     swipeRefreshLayout.isEnabled = hasCurrentQuery
 
@@ -109,7 +113,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
             }
 
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                blogAdapter.loadStateFlow
+                mainBlogAdapter.loadStateFlow
                      .distinctUntilChangedBy { it.source.refresh }
                     .filter { it.source.refresh is LoadState.NotLoading }
                     .collect {
@@ -125,7 +129,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
             }
 
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                blogAdapter.loadStateFlow
+                mainBlogAdapter.loadStateFlow
                     .collect { loadState ->
                         when (val refresh = loadState.mediator?.refresh) {
                             is LoadState.Loading -> {
@@ -135,19 +139,33 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                                 textViewNoResults.isVisible = false
 
                                 resultList.showIfOrInvisible {
-                                    !viewModel.newQueryInProgress &&  blogAdapter.itemCount > 0
+                                    !viewModel.newQueryInProgress &&  mainBlogAdapter.itemCount > 0
                                 }
 
                                 viewModel.refreshInProgress = true
                                 viewModel.pendingScrollToTopAfterRefresh = true
                             }
+                            is LoadState.NotLoading -> {
+                                textViewError.isVisible = false
+                                swipeRefreshLayout.isRefreshing = false
+                                resultList.isVisible = mainBlogAdapter.itemCount > 0
+
+                                val noCachedResults =
+                                    mainBlogAdapter.itemCount < 1 && loadState.source.append.endOfPaginationReached
+
+                                textViewError.isVisible = noCachedResults
+                                buttonRetry.isVisible = noCachedResults
+
+                                viewModel.refreshInProgress = false
+                                viewModel.newQueryInProgress = false
+                            }
                             is LoadState.Error -> {
                                 swipeRefreshLayout.isRefreshing = false
                                 textViewNoResults.isVisible = false
-                                resultList.isVisible = blogAdapter.itemCount > 0
+                                resultList.isVisible =  mainBlogAdapter.itemCount > 0
 
                                 val noCachedResults =
-                                    blogAdapter.itemCount < 1 && loadState.source.append.endOfPaginationReached
+                                    mainBlogAdapter.itemCount < 1 && loadState.source.append.endOfPaginationReached
 
                                 textViewError.isVisible = noCachedResults
                                 buttonRetry.isVisible = noCachedResults
@@ -166,14 +184,12 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                                 viewModel.newQueryInProgress = false
                                 viewModel.pendingScrollToTopAfterRefresh = false
                             }
-
                         }
-
                     }
             }
 
             swipeRefreshLayout.setOnRefreshListener {
-                blogAdapter.refresh()
+                mainBlogAdapter.refresh()
             }
 
 
@@ -192,9 +208,8 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
         val searchView = searchItem?.actionView as SearchView
 
         searchView. onQueryTextSubmit{ query ->
-            val searchText = "%$query%"
-            viewModel.onSearchQuerySubmit(searchText)
 
+            viewModel.onSearchQuerySubmit(query)
 
             searchView.clearFocus()
         }
@@ -203,15 +218,6 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
     }
 
-    private fun searchDatabase(query: String) {
-        val searchQuery = "%$query%"
-
-        viewModel.searchDatabase(searchQuery).observe(this, { list ->
-            list.let {
-                mainBlogAdapter.submitList(it)
-            }
-        })
-    }
 
 
 
