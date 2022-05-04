@@ -14,13 +14,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: BlogRepository,
-    private val connectivityManager: ConnectivityManager,
-
     ) : ViewModel() {
 
     private val eventChannel = Channel<Event>()
@@ -41,13 +40,20 @@ class HomeViewModel @Inject constructor(
             },
             onFetchFailed = { t ->
                 viewModelScope.launch { eventChannel.send(Event.ShowErrorMessage(t)) }
-            }
+            },
 
         )
 
-
-
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+
+    init {
+        viewModelScope.launch {
+            repository.deleteNonBookmarkedArticlesOlderThan(
+                System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)
+            )
+        }
+    }
 
 
     @ExperimentalCoroutinesApi
@@ -60,6 +66,7 @@ class HomeViewModel @Inject constructor(
 
         }
     }
+
     @ExperimentalCoroutinesApi
     fun onManualRefresh() {
         if (fetchBlogPost.value !is Resource.Loading) {
@@ -68,7 +75,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
 
 
     fun onBookmarkClick(blog: Blog) {
@@ -81,15 +87,13 @@ class HomeViewModel @Inject constructor(
     }
 
 
-
-
     private val maxRecentlyViewed = 5
     private val recentlyViewed = ArrayList<Blog>(maxRecentlyViewed)
 
-    fun addToRecentlyViedBlogs(blog: Blog){
+    fun addToRecentlyViedBlogs(blog: Blog) {
         val existingIndex = recentlyViewed.indexOf(blog)
-        if (existingIndex == -1){
-            recentlyViewed.add(0,blog)
+        if (existingIndex == -1) {
+            recentlyViewed.add(0, blog)
             for (index in recentlyViewed.lastIndex downTo maxRecentlyViewed)
                 recentlyViewed.removeAt(index)
         } else {
@@ -103,12 +107,6 @@ class HomeViewModel @Inject constructor(
     }
 
 
-
-//    val responseLiveData = liveData(Dispatchers.IO) {
-//        emit(repository.getResponseFromRealtimeDatabaseUsingCoroutines())
-//    }
-
-
     enum class Refresh {
         FORCE, NORMAL
     }
@@ -118,8 +116,4 @@ class HomeViewModel @Inject constructor(
     }
 
 
-
-    fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
-        repository.updateFavoriteStatus(id, isFavorite)
-    }
 }

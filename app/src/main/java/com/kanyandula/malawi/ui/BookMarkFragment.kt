@@ -63,7 +63,6 @@ class BookMarkFragment : Fragment(R.layout.fragment_book_mark) {
             listView.apply {
                 adapter = blogAdapter
                 layoutManager = LinearLayoutManager(requireContext())
-                //layoutManager = LinearLayoutManager(context)
                 setHasFixedSize(true)
             }
 

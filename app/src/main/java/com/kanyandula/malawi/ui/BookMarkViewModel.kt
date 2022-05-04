@@ -50,8 +50,6 @@ class BookMarkViewModel @Inject constructor(
             recentlyViewed[0] = blog
         }
     }
-    fun updateFavoriteStatus(id: String, favorite: Boolean) {
-        repository.updateFavoriteStatus(id, favorite)
-    }
+
 
 }

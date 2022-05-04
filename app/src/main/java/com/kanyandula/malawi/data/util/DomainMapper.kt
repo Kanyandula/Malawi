@@ -1,6 +1,6 @@
 package com.kanyandula.malawi.data.util
 
-import com.kanyandula.malawi.api.BlogDto
+
 
 interface DomainMapper <T, DomainModel>{
 

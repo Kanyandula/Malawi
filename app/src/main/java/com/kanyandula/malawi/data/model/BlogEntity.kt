@@ -14,7 +14,6 @@ data class Blog(
 
     var date: String? = null,
     val title: String? = null,
-   //@ColumnInfo(name ="description")
     val desc: String? = null,
     @PrimaryKey
     @NonNull

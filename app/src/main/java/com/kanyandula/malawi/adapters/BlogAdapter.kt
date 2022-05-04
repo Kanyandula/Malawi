@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.databinding.BlogListItemBinding
-import java.lang.ref.WeakReference
+
 
 class BlogAdapter(
     private val onItemClick: (Blog) -> Unit,

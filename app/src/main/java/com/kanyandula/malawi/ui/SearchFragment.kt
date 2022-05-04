@@ -104,7 +104,6 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.hasCurrentQuery.collect { hasCurrentQuery ->
                     textViewInstructions.isVisible = !hasCurrentQuery
-                    swipeRefreshLayout.isEnabled = hasCurrentQuery
 
                     if (!hasCurrentQuery) {
                         resultList.isVisible = false
@@ -135,19 +134,17 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                             is LoadState.Loading -> {
                                 textViewError.isVisible = false
                                 buttonRetry.isVisible = false
-                                swipeRefreshLayout.isRefreshing = true
                                 textViewNoResults.isVisible = false
 
                                 resultList.showIfOrInvisible {
                                     !viewModel.newQueryInProgress &&  mainBlogAdapter.itemCount > 0
                                 }
 
-                                viewModel.refreshInProgress = true
+
                                 viewModel.pendingScrollToTopAfterRefresh = true
                             }
                             is LoadState.NotLoading -> {
                                 textViewError.isVisible = false
-                                swipeRefreshLayout.isRefreshing = false
                                 resultList.isVisible = mainBlogAdapter.itemCount > 0
 
                                 val noCachedResults =
@@ -156,11 +153,10 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                                 textViewError.isVisible = noCachedResults
                                 buttonRetry.isVisible = noCachedResults
 
-                                viewModel.refreshInProgress = false
+
                                 viewModel.newQueryInProgress = false
                             }
                             is LoadState.Error -> {
-                                swipeRefreshLayout.isRefreshing = false
                                 textViewNoResults.isVisible = false
                                 resultList.isVisible =  mainBlogAdapter.itemCount > 0
 
@@ -180,7 +176,6 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                                 if (viewModel.refreshInProgress) {
                                     showSnackbar(errorMessage)
                                 }
-                                viewModel.refreshInProgress = false
                                 viewModel.newQueryInProgress = false
                                 viewModel.pendingScrollToTopAfterRefresh = false
                             }
@@ -188,9 +183,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                     }
             }
 
-            swipeRefreshLayout.setOnRefreshListener {
-                mainBlogAdapter.refresh()
-            }
+
 
 
         }

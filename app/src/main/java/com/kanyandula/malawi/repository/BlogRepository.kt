@@ -1,27 +1,16 @@
 package com.kanyandula.malawi.repository
 
 
-import com.kanyandula.malawi.api.BlogApi
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.paging.*
 import androidx.room.withTransaction
-
 import com.bumptech.glide.load.HttpException
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.kanyandula.malawi.api.BlogDtoMapper
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.data.BlogDataBase
-import com.kanyandula.malawi.data.SearchNewsRemoteMediator
-import com.kanyandula.malawi.data.model.BlogEntityMapper
 import com.kanyandula.malawi.data.model.LatestBlogs
 import com.kanyandula.malawi.utils.Resource
 import com.kanyandula.malawi.utils.networkBoundResource
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
@@ -32,12 +21,8 @@ import javax.inject.Inject
 
 
 class BlogRepository @Inject constructor(
-    private  val blogApi: BlogApi,
     private var blogRef: DatabaseReference,
     private val   blogDataBase: BlogDataBase,
-    private val entityMapper: BlogEntityMapper,
-    private val blogDtoMapper: BlogDtoMapper,
-    private val databaseAuth: FirebaseAuth
 ){
      private val blogDao = blogDataBase.blogDao()
 
@@ -45,13 +30,18 @@ class BlogRepository @Inject constructor(
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit,
-    )= networkBoundResource(
+
+    ): Flow<Resource<List<Blog>>> = networkBoundResource(
         query = {
             blogDao.getAllBlogFeed()
         },
         fetch = {
-            fetchBlogPost().blogs
+
+
+                fetchBlogPost().blogs
+
         },
+
         saveFetchResult = {  serverBlogArticles ->
 
             val bookmarkedArticles = blogDao.getAllBookmarkedBlogs().first()
@@ -76,14 +66,14 @@ class BlogRepository @Inject constructor(
 
                     )
 
-                    }
+                }
 
             val blogs = newBlogs?.map { article ->
                 LatestBlogs(article.image)
             }
             blogDataBase.withTransaction {
 
-                blogDao.deleteAllBlogFeed()
+               // blogDao.deleteAllBlogFeed()
 
                     if (newBlogs != null) {
                         blogDao.insertBlogs(newBlogs)
@@ -121,77 +111,12 @@ class BlogRepository @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     fun getSearchResultsPaged(
         query: String,
-        refreshOnInit: Boolean
     ): Flow<PagingData<Blog>> =
         Pager(
             config = PagingConfig(pageSize = 20, maxSize = 200),
             pagingSourceFactory = { blogDao.getSearchResultBlogPaged(query) }
         ).flow
 
-    fun getSearchResults(query: String, refreshOnInit: Boolean) =
-        Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                maxSize = 100,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { blogDao.getSearchResultBlogPaged(query) }
-        ).liveData
-
-
-
-
-    fun searchDatabase(searchQuery: String): Flow<List<Blog>> {
-        return blogDao.searchDatabase(searchQuery)
-    }
-
-
-
-
-
-
-    @ExperimentalCoroutinesApi
-    fun searchForBlogs(str: String, forceRefresh: Boolean) =  callbackFlow<Resource<MutableList<Blog>>> {
-        val queryBlog = blogRef.orderByChild("title")
-            .startAt(str).
-            endAt(str+"\uf8ff").addValueEventListener(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val queryList = mutableListOf<Blog>()
-                    if (snapshot.exists()){
-                        for (e in snapshot.children){
-                            val  blog = e.getValue(Blog::class.java)
-                            if (blog != null){
-                                queryList.add(blog)
-                            }
-                        }
-                        this@callbackFlow.trySendBlocking(Resource.Success(queryList))
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.w(TAG, "loadPost:onCancelled", error.toException())
-                    this@callbackFlow.trySendBlocking(Resource.Error(error.toException(), null))
-                }
-
-            })
-
-        blogRef
-            .addValueEventListener( queryBlog)
-
-        awaitClose {
-            blogRef
-                .removeEventListener( queryBlog)
-        }
-
-    }
-
-
-
-
-
-    fun updateFavoriteStatus(id: String, isFavorite: Boolean) {
-        blogRef.child(id).child("favorite").setValue(isFavorite)
-    }
 
 
 
@@ -224,24 +149,6 @@ class BlogRepository @Inject constructor(
         }
         return response
     }
-
-
-    private suspend fun searchBlogPost(str: String): BlogResponse {
-        val response = BlogResponse()
-        try {
-            response.blogs = blogRef.orderByChild("title")
-                .startAt(str).
-                endAt(str+"\uf8ff").
-
-                get().await().children.map { snapShot ->
-                    snapShot.getValue(Blog::class.java)!!
-                }
-        } catch (exception: Exception) {
-            response.exception = exception
-        }
-        return response
-    }
-
 
 
 

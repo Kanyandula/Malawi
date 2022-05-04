@@ -3,10 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/activity_main.xml" value="0.12552083333333333" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/blog_list_item.xml" value="0.14285714285714285" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_blog.xml" value="0.1" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_blog_detail.xml" value="0.1408514492753623" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_book_mark.xml" value="0.1" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_home.xml" value="0.17916666666666667" />
+        <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/fragment_search.xml" value="0.12552083333333333" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/layout/load_state_footer.xml" value="0.1" />
         <entry key="..\:/Users/admin/AndroidStudioProjects/Malawi2/app/src/main/res/menu/menu_bookmarks.xml" value="0.1" />
       </map>

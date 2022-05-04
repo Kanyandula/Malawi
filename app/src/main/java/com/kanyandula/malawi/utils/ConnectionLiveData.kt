@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConnectionLiveData (context: Context) : LiveData<Boolean>(){
+class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
