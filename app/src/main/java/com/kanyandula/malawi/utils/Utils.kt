@@ -24,18 +24,14 @@ inline fun <T : View> T.showIfOrInvisible(condition: (T) -> Boolean) {
 inline fun SearchView.onQueryTextSubmit(crossinline listener: (String) -> Unit) {
     this.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
-            if (!query.isNullOrBlank()) {
+            if (query != null) {
                 listener(query)
             }
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
-            if (!query.isNullOrBlank()) {
-                if (newText != null) {
-                    listener(newText)
-                }
-            }
+
             return true
         }
     })

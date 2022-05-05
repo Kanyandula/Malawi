@@ -23,6 +23,7 @@ import com.kanyandula.malawi.adapters.BlogArticlePagingAdapter
 import com.kanyandula.malawi.databinding.FragmentSearchBinding
 import com.kanyandula.malawi.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -83,13 +84,6 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
 
 
 
-//            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-//                viewModel.searchBlogPost.observe(viewLifecycleOwner) { data ->
-//                    Log.d("TAG", "$data")
-//                    blogAdapter.submitData(viewLifecycleOwner.lifecycle,data)
-//
-//                }
-//            }
 
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 viewModel.searchResults.collectLatest { data ->
@@ -201,7 +195,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
         val searchView = searchItem?.actionView as SearchView
 
         searchView. onQueryTextSubmit{ query ->
-
+            result_list.scrollToPosition(0)
             viewModel.onSearchQuerySubmit(query)
 
 

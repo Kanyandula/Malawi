@@ -4,7 +4,6 @@ package com.kanyandula.malawi.ui
 import androidx.lifecycle.*
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.repository.BlogRepository
-import com.kanyandula.malawi.utils.ConnectivityManager
 import com.kanyandula.malawi.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

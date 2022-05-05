@@ -13,8 +13,8 @@
     <string name="blog_image">blog image</string>
     <string name="fail_to_connect">Fail to connect</string>
     <string name="retry">Retry</string>
-    <string name="could_not_refresh">Could not refresh: %s</string>
-    <string name="network_not_available">Network Not Available: %s</string>
+    <string name="could_not_refresh">Could not refresh : %s </string>
+    <string name="network_not_available">Network Not Available</string>
     <string name =  "could_not_load_search_results"> Could not load search results : %s </string>
     <string name="unknown_error_occurred">An unknown error occurred</string>
     <string name="enter_both_email_and_password">Enter both e-mail and password</string>

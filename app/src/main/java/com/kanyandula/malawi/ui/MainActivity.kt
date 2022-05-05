@@ -22,37 +22,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var  navController: NavController
 
-    @Inject
-    lateinit var connectivityManager: com.kanyandula.malawi.utils.ConnectivityManager
-
-    override fun onStart() {
-        super.onStart()
-        connectivityManager.registerConnectionObserver(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        connectivityManager.unregisterConnectionObserver(this)
-    }
-    private lateinit var  connectionLiveData: ConnectionLiveData
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        connectionLiveData = ConnectionLiveData(this)
 
-//        connectionLiveData.observe(this) { isNetworkAvailable ->
-//
-//            if (isNetworkAvailable) {
-//
-//                Snackbar.make(View(this@MainActivity), "No network", Snackbar.LENGTH_SHORT).show()
-//            } else {
-//
-//                Snackbar.make(View(this@MainActivity), "Success", Snackbar.LENGTH_SHORT).show()
-//            }
-//
-//
-//        }
-//
+
+
+
 
 
 

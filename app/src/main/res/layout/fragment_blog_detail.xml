@@ -35,7 +35,6 @@
             android:padding="4dp">
 
 
-
             <TextView
                 android:id="@+id/textTitle"
                 android:layout_width="150dp"
@@ -48,15 +47,20 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/purple_700" />
+
             <TextView
                 android:id="@+id/textViewAbout"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
                 android:fontFamily="@font/actor"
                 android:text="@string/about"
-                android:textColor="@color/purple_700"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 

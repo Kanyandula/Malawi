@@ -27,10 +27,10 @@ class BlogRepository @Inject constructor(
      private val blogDao = blogDataBase.blogDao()
 
     fun getBlogFeed(
+
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit,
-
     ): Flow<Resource<List<Blog>>> = networkBoundResource(
         query = {
             blogDao.getAllBlogFeed()
@@ -85,7 +85,7 @@ class BlogRepository @Inject constructor(
             }
         },
         shouldFetch = { cachedArticles ->
-            if (forceRefresh) {
+            if ( forceRefresh) {
                 true
             } else {
                 val sortedArticles = cachedArticles.sortedBy { article ->
@@ -104,7 +104,8 @@ class BlogRepository @Inject constructor(
                 throw t
             }
             onFetchFailed(t)
-        }
+        },
+
 
         )
 

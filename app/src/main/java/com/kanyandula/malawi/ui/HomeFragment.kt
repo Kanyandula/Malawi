@@ -39,18 +39,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         currentBinding = FragmentHomeBinding.bind(view)
 
         connectionLiveData = ConnectionLiveData(requireContext())
-
-        connectionLiveData.observe(viewLifecycleOwner) { isNetworkAvailable ->
-
-            if (!isNetworkAvailable) {
-
-                Snackbar.make(binding.root,  getString(
-                    R.string.network_not_available
-                ), Snackbar.LENGTH_SHORT).show()
-            }
-
-
-        }
+      networkConnection()
 
 
         val blogAdapter = BlogAdapter(
@@ -79,6 +68,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 adapter = blogAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 (layoutManager as LinearLayoutManager).reverseLayout = true
+                (layoutManager as LinearLayoutManager).stackFromEnd = true
                 setHasFixedSize(true)
                 itemAnimator?.changeDuration = 0
             }
@@ -110,7 +100,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
             swipeRefresh.setOnRefreshListener {
+                networkConnection()
                 viewModel.onManualRefresh()
+
             }
 
             buttonRetry.setOnClickListener {
@@ -139,6 +131,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     }
 
+    private fun networkConnection(){
+        connectionLiveData.observe(viewLifecycleOwner) { isNetworkAvailable ->
+
+            if (!isNetworkAvailable) {
+
+                Snackbar.make(
+                    binding.root, getString(
+                        R.string.network_not_available
+                    ), Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
 
     override fun onStart() {
