@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.filter
 @AndroidEntryPoint
 class SearchFragment : Fragment(R.layout.fragment_search)   {
 
-
     private val  viewModel: SearchViewModel by viewModels()
 
     private var currentBinding: FragmentSearchBinding? = null
@@ -66,10 +65,7 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                 viewModel.onBookMarkClick(blog)
             },
 
-
         )
-
-
 
         binding.apply {
             resultList.apply {
@@ -176,9 +172,6 @@ class SearchFragment : Fragment(R.layout.fragment_search)   {
                         }
                     }
             }
-
-
-
 
         }
 
