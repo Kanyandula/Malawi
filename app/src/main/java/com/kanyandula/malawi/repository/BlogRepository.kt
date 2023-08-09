@@ -5,6 +5,7 @@ import androidx.paging.*
 import androidx.room.withTransaction
 import com.bumptech.glide.load.HttpException
 import com.google.firebase.database.*
+import com.kanyandula.malawi.api.BlogApi
 import com.kanyandula.malawi.api.BlogResponse
 import com.kanyandula.malawi.data.model.Blog
 import com.kanyandula.malawi.data.BlogDataBase
@@ -22,6 +23,7 @@ import javax.inject.Inject
 
 class BlogRepository @Inject constructor(
     private var blogRef: DatabaseReference,
+    private var blogApi: BlogApi,
     private val   blogDataBase: BlogDataBase,
 ){
      private val blogDao = blogDataBase.blogDao()
@@ -37,8 +39,8 @@ class BlogRepository @Inject constructor(
         },
         fetch = {
 
-
-                fetchBlogPost().blogs
+                val response = blogApi.getBreakingNews()
+                response.blogs
 
         },
 
